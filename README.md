@@ -8,7 +8,7 @@ Sistema de gestión de asistencias para estudiantes del nivel secundario técnic
 
 | Nombre completo            | DNI         | Curso            |
 |---------------------------|-------------|------------------|
-| Ricardo Francisco Núñez   |47.912.892   | 6° Año Informática |
+| Ricardo Francisco Núñez   | 47.912.891  | 6° Año Informática |
 | Ignacio Benjamin Chammella| 47.912.847  | 6° Año Informática |
 
 ---
@@ -33,16 +33,17 @@ Actualmente, muchas instituciones educativas registran las asistencias de forma 
 
 ## 🛠️ Tecnologías utilizadas
 
-- **Frontend:** HTML, CSS, 
+- **Frontend:** HTML5, CSS3, JavaScript
 - **Backend:** Python (Flask o Django)
 - **Base de Datos:** MySQL
 - **Diseño:** Canva / Figma (Mockups)
-- **Control de versiones:** GitHub
+- **Control de versiones:** Git y GitHub
 
 ---
 
 ## 📋 Funcionalidades esperadas
 
+- [x] Login de docente
 - [x] Registro de asistencia por fecha y curso
 - [x] Visualización de historial por estudiante
 - [x] Estadísticas de asistencia
@@ -51,13 +52,4 @@ Actualmente, muchas instituciones educativas registran las asistencias de forma 
 
 ---
 
-## 🧪 Testing inicial (Sprint 0)
 
-- ✔ Validación de requerimientos
-- ✔ Revisión de funcionalidades clave
-- ✔ Verificación de diseño de base de datos
-- ✔ Revisión entre pares del mockup
-- ✔ Checklist de entregables
-
----
-# Asistencias-PRoA
