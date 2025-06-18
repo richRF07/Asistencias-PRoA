@@ -9,7 +9,7 @@ Sistema de gestión de asistencias para estudiantes del nivel secundario técnic
 | Nombre completo            | DNI         | Curso            |
 |---------------------------|-------------|------------------|
 | Ricardo Francisco Núñez   |47.912.892   | 6° Año Informática |
-| Ignacio Benjamin Chammella| [DNI]       | 6° Año Informática |
+| Ignacio Benjamin Chammella| 47.912.847  | 6° Año Informática |
 
 ---
 
@@ -60,7 +60,4 @@ Actualmente, muchas instituciones educativas registran las asistencias de forma 
 - ✔ Checklist de entregables
 
 ---
-
-## 📁 Estructura del repositorio
-
 # Asistencias-PRoA
