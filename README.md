@@ -1,55 +1,66 @@
 # 📘 Asistencia PROA
 
-Sistema de gestión de asistencias para estudiantes del nivel secundario técnico, desarrollado como parte de la tesina final de la especialidad en Desarrollo de Software del colegio PROA.
+A student attendance management system for technical secondary education, developed as part of the final thesis project in the Software Development specialization at PROA High School.
 
 ---
 
-## 👥 Integrantes del equipo
+## 👥 Team Members
 
-| Nombre completo            | DNI         | Curso            |
-|---------------------------|-------------|------------------|
-| Ricardo Francisco Núñez   | 47.912.891  | 6° Año Informática |
-| Ignacio Benjamin Chammella| 47.912.847  | 6° Año Informática |
-
----
-
-## 🧠 Fundamentación del proyecto
-
-Actualmente, muchas instituciones educativas registran las asistencias de forma manual, utilizando planillas en papel o Excel, lo que genera errores frecuentes, pérdida de información y dificulta el seguimiento del historial de los estudiantes.
-
-**Asistencia PROA** surge como una solución digital que permite registrar, consultar y visualizar la asistencia de forma más ágil, organizada y segura. Nuestro objetivo es facilitar el trabajo docente y mejorar la gestión institucional.
+| Full Name                  | ID Number   | Class                  |
+|---------------------------|-------------|------------------------|
+| Ricardo Francisco Núñez   | 47.912.892  | 6th Year - IT Program  |
+| Ignacio Benjamín Chammella| 47.912.847  | 6th Year - IT Program  |
 
 ---
 
-## 🎯 Objetivos del proyecto
+## 🧠 Project Justification
 
-- Desarrollar una aplicación web que registre las asistencias de los estudiantes por día y curso.
-- Permitir a los docentes marcar: Presente, Tarde, Ausente, Justificada.
-- Ofrecer visualización de estadísticas y porcentajes de asistencia por estudiante y curso.
-- Facilitar exportación de reportes (Excel / PDF).
-- Asegurar el acceso seguro mediante login de docentes autorizados.
+Currently, many schools still record attendance manually using paper forms or Excel spreadsheets. This leads to frequent errors, data loss, and difficulty tracking student attendance history.
+
+**Asistencia PROA** was created as a digital solution that enables faster, more organized, and more secure attendance management. Our goal is to support teachers in their daily work and improve overall school administration.
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## 🎯 Project Objectives
 
-- **Frontend:** HTML5, CSS3, JavaScript
-- **Backend:** Python (Flask o Django)
-- **Base de Datos:** MySQL
-- **Diseño:** Canva / Figma (Mockups)
-- **Control de versiones:** Git y GitHub
-
----
-
-## 📋 Funcionalidades esperadas
-
-- [x] Login de docente
-- [x] Registro de asistencia por fecha y curso
-- [x] Visualización de historial por estudiante
-- [x] Estadísticas de asistencia
-- [ ] Exportación de reportes
-- [ ] Versión responsive (adaptada a móviles)
+- Develop a web application that registers student attendance by date and class.
+- Allow teachers to mark students as: Present, Late, Absent, or Justified.
+- Display attendance statistics and percentages by student and class.
+- Allow exporting of attendance reports (Excel / PDF).
+- Ensure secure access through login for authorized teachers.
 
 ---
 
+## 🛠️ Technologies Used
+
+- **Frontend:** HTML5, CSS3, JavaScript  
+- **Backend:** Python (Flask or Django)  
+- **Database:** MySQL  
+- **Design & Mockups:** Canva / Figma  
+- **Version Control:** Git and GitHub  
+
+---
+
+## 📋 Expected Features
+
+- [x] Teacher login  
+- [x] Attendance registration by date and class  
+- [x] View attendance history per student  
+- [x] Attendance statistics dashboard  
+- [ ] Export reports (Excel / PDF)  
+- [ ] Responsive layout (mobile-friendly)  
+
+---
+
+## 🧪 Initial Testing (Sprint 0)
+
+- ✔ Requirements validation  
+- ✔ Review of key functionalities  
+- ✔ Database design verification  
+- ✔ Peer review of mockup  
+- ✔ Checklist of deliverables  
+
+---
+
+## 📁 Repository Structure
 
