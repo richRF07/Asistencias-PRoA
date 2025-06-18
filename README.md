@@ -52,15 +52,3 @@ Currently, many schools still record attendance manually using paper forms or Ex
 
 ---
 
-## 🧪 Initial Testing (Sprint 0)
-
-- ✔ Requirements validation  
-- ✔ Review of key functionalities  
-- ✔ Database design verification  
-- ✔ Peer review of mockup  
-- ✔ Checklist of deliverables  
-
----
-
-## 📁 Repository Structure
-
