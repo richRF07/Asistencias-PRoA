@@ -4,9 +4,10 @@ Sistema de Gestión de Asistencia para Secundaria Técnica
 Desarrollado como parte del proyecto final de tesis en la especialización de Desarrollo de Software en el Colegio PROA.
 
 👥 Integrantes del Equipo
-Nombre Completo	DNI	Curso
-Ricardo Francisco Núñez	47.912.892	6º Año - Tec. Informática
-Ignacio Benjamín Chammella	47.912.847	6º Año - Tec. Informática
+| Nombre Completo            | DNI        | Curso                     |
+| -------------------------- | ---------- | ------------------------- |
+| Ricardo Francisco Núñez    | 47.912.892 | 6º Año - Tec. Informática |
+| Ignacio Benjamín Chammella | 47.912.847 | 6º Año - Tec. Informática |
 
 🧠 Justificación del Proyecto
 Actualmente, muchas escuelas aún registran la asistencia de forma manual, usando formularios en papel o planillas de Excel. Esto genera errores frecuentes, pérdida de datos y dificultad para hacer seguimiento histórico de la asistencia de los estudiantes.
