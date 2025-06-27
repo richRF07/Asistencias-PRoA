@@ -1,54 +1,49 @@
 # 📘 Asistencia PROA
 
-A student attendance management system for technical secondary education, developed as part of the final thesis project in the Software Development specialization at PROA High School.
+Sistema de Gestión de Asistencia para Secundaria Técnica
+Desarrollado como parte del proyecto final de tesis en la especialización de Desarrollo de Software en el Colegio PROA.
 
----
+👥 Integrantes del Equipo
+Nombre Completo	DNI	Curso
+Ricardo Francisco Núñez	47.912.892	6º Año - Tec. Informática
+Ignacio Benjamín Chammella	47.912.847	6º Año - Tec. Informática
 
-## 👥 Team Members
+🧠 Justificación del Proyecto
+Actualmente, muchas escuelas aún registran la asistencia de forma manual, usando formularios en papel o planillas de Excel. Esto genera errores frecuentes, pérdida de datos y dificultad para hacer seguimiento histórico de la asistencia de los estudiantes.
 
-| Full Name                  | ID Number   | Class                  |
-|---------------------------|-------------|------------------------|
-| Ricardo Francisco Núñez   | 47.912.892  | 6th Year - IT Program  |
-| Ignacio Benjamín Chammella| 47.912.847  | 6th Year - IT Program  |
+Asistencia PROA fue creado como una solución digital que permite una gestión más rápida, organizada y segura de la asistencia. Nuestro objetivo es apoyar a los docentes en su trabajo diario y mejorar la administración general del colegio.
 
----
+🎯 Objetivos del Proyecto
+Desarrollar una aplicación web que registre la asistencia de los estudiantes por fecha y curso.
 
-## 🧠 Project Justification
+Permitir que los docentes marquen a los estudiantes como: Presente, Tarde, Ausente o Justificado.
 
-Currently, many schools still record attendance manually using paper forms or Excel spreadsheets. This leads to frequent errors, data loss, and difficulty tracking student attendance history.
+Mostrar estadísticas y porcentajes de asistencia por alumno y curso.
 
-**Asistencia PROA** was created as a digital solution that enables faster, more organized, and more secure attendance management. Our goal is to support teachers in their daily work and improve overall school administration.
+Permitir la exportación de reportes de asistencia (Excel / PDF).
 
----
+Garantizar acceso seguro mediante login para docentes autorizados.
 
-## 🎯 Project Objectives
+🛠️ Tecnologías Utilizadas
+Frontend: HTML5, CSS3, JavaScript
 
-- Develop a web application that registers student attendance by date and class.
-- Allow teachers to mark students as: Present, Late, Absent, or Justified.
-- Display attendance statistics and percentages by student and class.
-- Allow exporting of attendance reports (Excel / PDF).
-- Ensure secure access through login for authorized teachers.
+Backend: Python (Flask o Django)
 
----
+Base de datos: MySQL
 
-## 🛠️ Technologies Used
+Diseño y Maquetas: Canva / Figma
 
-- **Frontend:** HTML5, CSS3, JavaScript  
-- **Backend:** Python (Flask or Django)  
-- **Database:** MySQL  
-- **Design & Mockups:** Canva / Figma  
-- **Version Control:** Git and GitHub  
+Control de versiones: Git y GitHub
 
----
+📋 Funcionalidades Esperadas
+ Login para docentes
 
-## 📋 Expected Features
+ Registro de asistencia por fecha y curso
 
-- [x] Teacher login  
-- [x] Attendance registration by date and class  
-- [x] View attendance history per student  
-- [x] Attendance statistics dashboard  
-- [ ] Export reports (Excel / PDF)  
-- [ ] Responsive layout (mobile-friendly)  
+ Visualización del historial de asistencia por estudiante
 
----
+ Panel de estadísticas de asistencia
 
+ Exportar reportes (Excel / PDF)
+
+ Diseño responsivo (compatible con dispositivos móviles)
