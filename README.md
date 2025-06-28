@@ -59,7 +59,7 @@ Diseño y Maquetas: Canva / Figma
 
 Control de versiones: GitHub
 
-(Version Control: Git and GitHub)
+(Version Control:GitHub)
 
 ## 📋 Funcionalidades Esperadas / Expected Features :
 
