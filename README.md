@@ -54,6 +54,7 @@ Base de datos: MySQL
 (Database: MySQL)
 
 Diseño y Maquetas: Canva / Figma
+
 (Design and Mockups: Canva / Figma)
 
 Control de versiones: GitHub
