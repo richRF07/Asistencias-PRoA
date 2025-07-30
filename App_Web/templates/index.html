@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Asistencias</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:display=swap" rel="stylesheet">
+</head>
+<body class="fondo">
+  <header>
+    <h1>📘 Registro de Asistencias</h1>
+    <nav style="margin-top: 10px;">
+      <a href="/login" style="color: #2fccf7; text-decoration: none; margin: 0 15px;">Login</a>
+      <a href="/registro" style="color: #2fccf7; text-decoration: none; margin: 0 15px;">Registro</a>
+    </nav>
+  </header>
+
+  <main class="contenedor-formulario">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="flash-message {% if '✅' in message %}success{% elif '❌' in message %}error{% else %}warning{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <h2>Agregar Estudiante y Asistencia</h2>
+    <form action="/registrar" method="POST" class="formulario">
+      <label for="curso">Curso:</label>
+      <select name="curso" id="curso" required>
+        <option value="">Seleccionar</option>
+        <option value="1">Curso 1</option>
+        <option value="2">Curso 2</option>
+        <option value="3">Curso 3</option>
+        <option value="4">Curso 4</option>
+        <option value="5">Curso 5</option>
+        <option value="6">Curso 6</option>
+      </select>
+
+      <label for="nombre">Nombre del estudiante:</label>
+      <input type="text" id="nombre" name="nombre" required>
+
+      <label for="fecha">Fecha (YYYY-MM-DD):</label>
+      <input type="date" id="fecha" name="fecha">
+
+      <label for="estado">Estado:</label>
+      <select name="estado" id="estado" required>
+        <option value="">Seleccionar</option>
+        <option value="Presente">Presente</option>
+        <option value="Tarde">Tarde</option>
+        <option value="Ausente">Ausente</option>
+        <option value="Justificado">Justificado</option>
+      </select>
+
+      <label for="observaciones">Observaciones:</label>
+      <textarea id="observaciones" name="observaciones" rows="3" placeholder="Escribe algo si es necesario..."></textarea>
+
+      <button type="submit">Registrar Asistencia</button>
+    </form>
+  </main>
+</body>
+</html>

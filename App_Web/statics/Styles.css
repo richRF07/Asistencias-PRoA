@@ -1,0 +1,186 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: 'Poppins', sans-serif;
+  height: 100%;
+}
+
+body.fondo {
+  background-image: url('/imagenes/Schiaretti-habilita-la-escuela-Proa-2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Header */
+header {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  text-align: center;
+  padding: 25px 10px;
+  font-size: 1.8rem;
+  text-shadow: 1px 1px 4px black;
+}
+
+/* Contenedor principal */
+.contenedor-formulario {
+  max-width: 600px;
+  margin: 50px auto;
+  background-color: rgba(255, 255, 255, 0.92);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.contenedor-formulario h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #222;
+}
+
+/* Formulario */
+.formulario label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.formulario input,
+.formulario select,
+.formulario textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+}
+
+.formulario button {
+  margin-top: 25px;
+  padding: 12px;
+  width: 100%;
+  background-color: #2fccf7;
+  border: none;
+  color: black;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.formulario button:hover {
+  background-color: #1ca6c1;
+}
+
+/* Estilos adicionales para login y registro */
+.container {
+  max-width: 500px;
+  margin: 50px auto;
+  background-color: rgba(255, 255, 255, 0.92);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.img-principal {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+.btn {
+  margin-top: 25px;
+  padding: 12px 30px;
+  background-color: #2fccf7;
+  border: none;
+  color: black;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #1ca6c1;
+}
+
+.texto-centro {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.texto-centro a {
+  color: #2fccf7;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.texto-centro a:hover {
+  text-decoration: underline;
+}
+
+/* Estilos para mensajes flash */
+.flash-messages {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.flash-message {
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  animation: slideIn 0.3s ease;
+}
+
+.flash-message.success {
+  background-color: #28a745;
+}
+
+.flash-message.error {
+  background-color: #dc3545;
+}
+
+.flash-message.warning {
+  background-color: #ffc107;
+  color: #333;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .contenedor-formulario,
+  .container {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  header {
+    font-size: 1.5rem;
+    padding: 20px 10px;
+  }
+}

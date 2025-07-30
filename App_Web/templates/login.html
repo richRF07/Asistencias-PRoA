@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Formulario de Asistencia</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='Styles.css') }}" />
+</head>
+<body>
+  <div class="container">
+    <img src="{{ url_for('static', filename='img/asistencia.jpg') }}" class="img-principal" alt="Formulario" />
+    <h1>📝 Iniciar Sesión</h1>
+    <form method="POST">
+      <label for="nombre">Nombre y Apellido:</label>
+      <input type="text" id="nombre" name="nombre" required />
+
+      <label for="curso">Curso:</label>
+      <input type="text" id="curso" name="curso" required />
+
+      <label for="fecha">Fecha:</label>
+      <input type="date" id="fecha" name="fecha" required />
+
+      <button type="submit" class="btn">Iniciar Sesión</button>
+    </form>
+    
+    <p class="texto-centro">
+      ¿No tienes cuenta? <a href="/registro">Registrarse</a> | 
+      <a href="/">Volver al inicio</a>
+    </p>
+  </div>
+</body>
+</html>
