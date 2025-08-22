@@ -9,11 +9,9 @@ body, html {
   height: 100%;
 }
 
-body.fondo {
-  background-image: url('/imagenes/Schiaretti-habilita-la-escuela-Proa-2.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+.fondo {
+  /* Set the background image from your HTML template or inline style */
+  background: url('/static/img/Schiarett-Proa-2.jpg') center center / cover no-repeat;
 }
 
 /* Header */

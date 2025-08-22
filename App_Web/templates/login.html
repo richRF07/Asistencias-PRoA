@@ -1,43 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Login - Registro de Asistencias</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='Login.css') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>Formulario de Asistencia</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}" />
 </head>
-<body class="fondo">
-  <header>
-    <h1>📘 Registro de Asistencias</h1>
-    <nav style="margin-top: 10px;">
-      <a href="/login" style="color: #2fccf7; text-decoration: none; margin: 0 15px;">Login</a>
-      <a href="/registro" style="color: #2fccf7; text-decoration: none; margin: 0 15px;">Registro</a>
-    </nav>
-  </header>
+<body>
+  <div class="container">
+   <img src="{{ url_for('static', filename='/static/img/logo.jpg') }}" class="img-principal" alt="Formulario" />
+    <h1>📝 Iniciar Sesión</h1>
+    <form method="POST">
+      <label for="nombre">Nombre y Apellido:</label>
+      <input type="text" id="nombre" name="nombre" required />
 
-  <main class="contenedor-formulario">
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for message in messages %}
-            <div class="flash-message {% if '✅' in message %}success{% elif '❌' in message %}error{% else %}warning{% endif %}">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
+      <label for="curso">Curso:</label>
+      <input type="text" id="curso" name="curso" required />
 
-    <h2>Login</h2>
-    <form action="/login" method="POST" class="formulario">
-      <label for="usuario">Usuario:</label>
-      <input type="text" id="usuario" name="usuario" placeholder="Tu usuario" required>
+      <label for="fecha">Fecha:</label>
+      <input type="date" id="fecha" name="fecha" required />
 
-      <label for="password">Contraseña:</label>
-      <input type="password" id="password" name="password" placeholder="Tu contraseña" required>
-
-      <button type="submit">Iniciar Sesión</button>
+      <button type="submit" class="btn">Iniciar Sesión</button>
     </form>
-  </main>
+    
+    <p class="texto-centro">
+      ¿No tienes cuenta? <a href="/registro">Registrarse</a> | 
+      <a href="/">Volver al inicio</a>
+    </p>
+  </div>
 </body>
 </html>

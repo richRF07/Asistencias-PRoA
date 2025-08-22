@@ -41,7 +41,8 @@ def registrar():
     if not curso or not nombre or not estado:
         flash("⚠️ Faltan campos obligatorios.")
         return redirect('/')
-
+    conn = None
+    cursor = None
     try:
         conn = conectar_db()
         cursor = conn.cursor()
