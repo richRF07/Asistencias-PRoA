@@ -7,12 +7,16 @@ app.secret_key = 'clave_secreta_para_flash'
 
 # Conexión a MySQL
 def conectar_db():
-    return pymysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="root",
-        database="asistencia_db"
-    )
+ try:
+        return pymysql.connect(
+            host="localhost",
+            user="root",
+            password="root",
+            database="asistenciasdb"
+        )
+ except pymysql.err.OperationalError as e:
+        print(f"Error de conexión: {e}")
+        return None
 
 # Ruta principal con formulario
 @app.route('/')
@@ -69,6 +73,33 @@ def registrar():
         conn.close()
 
     return redirect('/')
+
+@app.route('/registrar_usuario', methods=['POST'])
+def registrar_usuario():
+    nombre = request.form.get('nombre')
+    email = request.form.get('email')
+    password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+
+    if not nombre or not email or not password or not confirm_password:
+        flash("⚠️ Todos los campos son obligatorios.")
+        return redirect('/registro')
+
+    if password != confirm_password:
+        flash("Las contraseñas no coinciden")
+        return redirect('/registro')
+
+    conexion = conectar_db()
+    if not conexion:
+        flash("❌ Error de conexión a la base de datos.")
+        return redirect('/registro')
+    with conexion.cursor() as cursor:
+        sql = "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)"
+        cursor.execute(sql, (nombre, email, password))
+        conexion.commit()
+    conexion.close()
+    flash("✅ Usuario registrado correctamente.")
+    return redirect('/login')
 
 # Ejecutar la app
 if __name__ == '__main__':
