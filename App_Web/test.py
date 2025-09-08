@@ -6,7 +6,7 @@ try:
         user="root",
         password="root",  # O "" si no tienes contraseña
         database="asistenciasdb",
-        port=3306         # Cambia si es necesario
+        port=3307         # Cambia si es necesario
     )
     print("Conexión exitosa")
     conn.close()

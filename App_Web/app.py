@@ -10,9 +10,10 @@ def conectar_db():
  try:
         return pymysql.connect(
             host="localhost",
-            user="root",
-            password="root",
-            database="asistenciasdb"
+            user="root",     # Asegurate de que este usuario exista en tu MySQL
+            password="root",          # Y que la contraseña sea correcta
+            database="asistenciasdb",  # Y que esta base de datos exista
+            port=3307         # Cambia si es necesario
         )
  except pymysql.err.OperationalError as e:
         print(f"Error de conexión: {e}")
@@ -29,13 +30,17 @@ def login():
     return render_template('login.html')
 
 # Ruta para el registro
-@app.route('/registro')
-def registro():
-    return render_template('registro.html')
+#@app.route('/registro')
+#def registro():
+ #   return render_template('registro.html')
 
 # Ruta para registrar la asistencia
-@app.route('/registrar', methods=['POST'])
+@app.route('/registro', methods=['GET', 'POST'])
 def registrar():
+    if request.method == 'GET':
+        # Muestra el formulario de registro de asistencia
+        return render_template('registro.html')  # Cambia por tu template
+    # Procesa el formulario de registro de asistencia
     curso = request.form.get('curso')
     nombre = request.form.get('nombre')
     fecha = request.form.get('fecha') or date.today().isoformat()
@@ -93,12 +98,16 @@ def registrar_usuario():
     if not conexion:
         flash("❌ Error de conexión a la base de datos.")
         return redirect('/registro')
-    with conexion.cursor() as cursor:
-        sql = "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)"
-        cursor.execute(sql, (nombre, email, password))
-        conexion.commit()
-    conexion.close()
-    flash("✅ Usuario registrado correctamente.")
+    try:
+        with conexion.cursor() as cursor:
+            sql = "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (nombre, email, password))
+            conexion.commit()
+        flash("✅ Usuario registrado correctamente.")
+    except Exception as e:
+        flash(f"❌ Error al registrar usuario: {e}")
+    finally:
+        conexion.close()
     return redirect('/login')
 
 # Ejecutar la app

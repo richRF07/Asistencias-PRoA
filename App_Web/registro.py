@@ -1,11 +1,12 @@
-import mysql.connector
+import pymysql
 
 # Conexión a la base de datos
-conn = mysql.connector.connect(
+conn = pymysql.connect(
     host="localhost",
     user="root",     # Asegurate de que este usuario exista en tu MySQL
     password="root",          # Y que la contraseña sea correcta
-    database="asistenciasdb"  # Y que esta base de datos exista
+    database="asistencia_db",  # Y que esta base de datos exista
+    port=3307         # Cambia si es necesario
 )
 
 cursor = conn.cursor()
