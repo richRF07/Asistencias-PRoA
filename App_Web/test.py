@@ -5,7 +5,7 @@ try:
         host="localhost",
         user="root",
         password="root",  # O "" si no tienes contraseña
-        database="asistenciasdb",
+        database="asistencia_db",
         port=3307         # Cambia si es necesario
     )
     print("Conexión exitosa")
