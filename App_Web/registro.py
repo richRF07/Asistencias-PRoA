@@ -5,7 +5,7 @@ conn = mysql.connector.connect(
     host="localhost",
     user="root",     # Asegurate de que este usuario exista en tu MySQL
     password="root",          # Y que la contraseña sea correcta
-    database="asistencia_db"  # Y que esta base de datos exista
+    database="asistenciasdb"  # Y que esta base de datos exista
 )
 
 cursor = conn.cursor()

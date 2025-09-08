@@ -11,6 +11,10 @@ body {
   color: #fff;
 }
 
+.fondo {
+  /* Set the background image from your HTML template or inline style */
+  background: url('/static/img/Schiarett-Proa-2.jpg') center center / cover no-repeat;
+}
 /* === Contenedor principal === */
 .container {
   background: rgba(255, 255, 255, 0.1);
