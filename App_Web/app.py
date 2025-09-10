@@ -25,7 +25,7 @@ def sanitizar_curso(curso: str) -> str:
     if not curso:
         return ''
     if not re.fullmatch(r"[A-Za-z0-9_]{1,32}", curso):
-        return ''
+        return ''   
     return curso
 
 def asegurar_tablas(conn, tabla_estudiantes: str, tabla_asistencias: str):
