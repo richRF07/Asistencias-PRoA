@@ -4,14 +4,40 @@ import pymysql
 conn = pymysql.connect(
     host="localhost",
     user="root",     # Asegurate de que este usuario exista en tu MySQL
-    password="root",          # Y que la contraseña sea correcta
+    password="root", # Y que la contraseña sea correcta
     database="asistencia_db",  # Y que esta base de datos exista
-    port=3307         # Cambia si es necesario
+    port=3307        # Cambia si es necesario
 )
 
 cursor = conn.cursor()
 
+# -------------------------------
+# Crear tabla de usuarios
+# -------------------------------
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    contraseña VARCHAR(255) NOT NULL,
+    rol ENUM('admin', 'docente', 'alumno') NOT NULL DEFAULT 'alumno'
+) ENGINE=InnoDB;
+''')
+
+# -------------------------------
+# Crear tabla de cursos
+# -------------------------------
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS cursos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion TEXT
+) ENGINE=InnoDB;
+''')
+
+# -------------------------------
 # Crear tablas para cada curso (del 1 al 6)
+# -------------------------------
 for curso in range(1, 7):
     nombre_tabla_est = f"estudiantes_{curso}"
     nombre_tabla_asis = f"asistencias_{curso}"
@@ -20,7 +46,10 @@ for curso in range(1, 7):
     cursor.execute(f'''
     CREATE TABLE IF NOT EXISTS {nombre_tabla_est} (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        nombre VARCHAR(255) NOT NULL
+        nombre VARCHAR(255) NOT NULL,
+        curso_id INT,
+        FOREIGN KEY (curso_id) REFERENCES cursos(id)
+            ON DELETE CASCADE
     ) ENGINE=InnoDB;
     ''')
 
@@ -42,4 +71,4 @@ conn.commit()
 cursor.close()
 conn.close()
 
-print("✅ Base de datos y tablas por curso creadas correctamente.")
+print("✅ Base de datos, tablas de usuarios, cursos y estudiantes creadas correctamente.")

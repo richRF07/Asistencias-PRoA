@@ -1,6 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <meta charset="UTF-8">
+  <title>Iniciar sesión</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:display=swap" rel="stylesheet">
+</head>
+<body class="fondo">
+  <header>
+    <h1>🔐 Iniciar sesión</h1>
+  </header>
+  <main class="contenedor-formulario">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="flash-message {% if '✅' in message %}success{% elif '❌' in message %}error{% else %}warning{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <form action="/login" method="POST" class="formulario">
+      <label for="email">Correo electrónico:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="password">Contraseña:</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Entrar</button>
+    </form>
+    <p class="texto-centro">¿No tienes cuenta? <a href="/registro">Crear una</a></p>
+  </main>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
   <meta charset="UTF-8" />
   <title>Login</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
