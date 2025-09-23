@@ -2,66 +2,57 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Iniciar sesión</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:display=swap" rel="stylesheet">
-</head>
-<body class="fondo">
-  <header>
-    <h1>🔐 Iniciar sesión</h1>
-  </header>
-  <main class="contenedor-formulario">
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for message in messages %}
-            <div class="flash-message {% if '✅' in message %}success{% elif '❌' in message %}error{% else %}warning{% endif %}">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-    <form action="/login" method="POST" class="formulario">
-      <label for="email">Correo electrónico:</label>
-      <input type="email" id="email" name="email" required>
-
-      <label for="password">Contraseña:</label>
-      <input type="password" id="password" name="password" required>
-
-      <button type="submit">Entrar</button>
-    </form>
-    <p class="texto-centro">¿No tienes cuenta? <a href="/registro">Crear una</a></p>
-  </main>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Login</title>
+  <title>Iniciar Sesión</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <img src="{{ url_for('static', filename='img/logo.jpg') }}" class="img-principal" alt="Logo" />
+  <!-- Imagen de fondo directamente en el HTML -->
+  <div class="fondo" style="background-image: url('{{ url_for('static', filename='img/Schiaretti-Proa-3.jpg') }}');"></div>
 
-    <h1>🔐 Iniciar Sesión</h1>
-    
-    <form method="POST" action="/login">
-      <label for="usuario">Usuario:</label>
-      <input type="text" id="usuario" name="usuario" placeholder="Ingresa tu usuario" required />
+  <!-- Overlay para oscurecer ligeramente la imagen -->
+  <div class="overlay"></div>
+  
+  <!-- Contenedor del login centrado -->
+  <div class="login-container">
+    <div class="login-box">
+      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="logo">
 
-      <label for="password">Contraseña:</label>
-      <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required />
+      <h1>🔐 Iniciar Sesión</h1>
 
-      <button type="submit" class="btn">Ingresar</button>
-    </form>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for message in messages %}
+              <div class="flash-message 
+                {% if '✅' in message %} success 
+                {% elif '❌' in message %} error 
+                {% else %} warning {% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
 
-    <p class="texto-centro">
-      ¿No tienes cuenta? <a href="/registro">Registrarse</a> | 
-      <a href="/">Volver al inicio</a>
-    </p>
+      <form action="/login" method="POST">
+        <div class="input-group">
+          <label for="usuario">Usuario</label>
+          <input type="text" id="usuario" name="usuario" placeholder="Ingresa tu usuario" required>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+        </div>
+
+        <button type="submit" class="btn">Ingresar</button>
+      </form>
+
+      <p class="registro">
+        ¿No tienes cuenta? <a href="/registro">Registrarse</a> | <a href="/">Volver al inicio</a>
+      </p>
+    </div>
   </div>
 </body>
 </html>

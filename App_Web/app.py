@@ -11,7 +11,7 @@ app.secret_key = 'clave_secreta_para_flash'
 DB_HOST = "localhost"
 DB_USER = "root"
 DB_PASSWORD = "admin123"
-DB_NAME = "asistencias_db"
+DB_NAME = "asistencia_db"
 DB_PORT = 3307  # Cambiar solo si MySQL usa otro puerto
 
 # ----- CONEXIÓN A MYSQL -----
@@ -42,10 +42,10 @@ def crear_base_datos():
 
 # ----- FUNCIONES AUXILIARES -----
 def sanitizar_curso(curso: str) -> str:
-    """Permite solo letras, números y guiones bajos en el nombre de curso."""
+    """Permite letras, números, espacios, guiones y guiones bajos en el nombre de curso."""
     if not curso:
         return ''
-    if not re.fullmatch(r"[A-Za-z0-9_]{1,32}", curso):
+    if not re.fullmatch(r"[A-Za-z0-9 _-]{1,32}", curso):
         return ''
     return curso
 
@@ -104,6 +104,9 @@ def registrar_asistencia():
     estado = request.form.get('estado')
     observaciones = request.form.get('observaciones', '')
 
+    # --- DEBUG: Mostrar en consola los datos recibidos ---
+    print(f"DEBUG -> curso={curso}, nombre={nombre}, fecha={fecha}, estado={estado}, observaciones={observaciones}")
+
     if not curso or not nombre or not estado:
         flash("⚠️ Faltan campos obligatorios o el curso tiene caracteres inválidos.")
         return redirect('/registro')
@@ -141,6 +144,7 @@ def registrar_asistencia():
             flash("✅ Asistencia registrada correctamente.")
     except Exception as e:
         conn.rollback()
+        print(f"ERROR en registrar_asistencia: {e}")  # --- DEBUG en consola ---
         flash(f"❌ Error al registrar: {e}")
     finally:
         conn.close()
@@ -180,6 +184,7 @@ def registrar_usuario():
     except pymysql.err.IntegrityError:
         flash("⚠️ El email ya está registrado.")
     except Exception as e:
+        print(f"ERROR en registrar_usuario: {e}")  # --- DEBUG en consola ---
         flash(f"❌ Error al registrar usuario: {e}")
     finally:
         conn.close()
