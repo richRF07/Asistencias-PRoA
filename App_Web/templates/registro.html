@@ -6,37 +6,37 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
 </head>
 <body class="fondo">
+
+  <!-- Encabezado -->
   <header>
     <h1>📝 Registro de Usuario</h1>
   </header>
 
-
+  <!-- Contenido principal -->
   <main class="contenedor-formulario">
     <h2>Crear Nueva Cuenta</h2>
+
     <form action="/registrar_usuario" method="POST" class="formulario">
       <label for="nombre">Nombre completo:</label>
       <input type="text" id="nombre" name="nombre" required>
 
-
       <label for="email">Correo electrónico:</label>
       <input type="email" id="email" name="email" required>
-
 
       <label for="password">Contraseña:</label>
       <input type="password" id="password" name="password" required>
 
-
       <label for="confirm_password">Confirmar contraseña:</label>
       <input type="password" id="confirm_password" name="confirm_password" required>
 
-
       <button type="submit">Registrarse</button>
     </form>
-   
+
     <p class="texto-centro">
       ¿Ya tienes cuenta? <a href="/login">Iniciar sesión</a> |
       <a href="/">Volver al inicio</a>
     </p>
   </main>
+
 </body>
 </html>
