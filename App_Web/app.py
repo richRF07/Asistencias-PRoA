@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, flash
 from datetime import date
 import pymysql
-import re
 from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_para_flash'
@@ -31,15 +31,6 @@ def conectar_db(db_name=None):
         print(f"Error de conexión: {e}")
         return None
 
-def crear_base_datos():
-    """Crea la base de datos si no existe."""
-    conn = conectar_db()
-    if conn:
-        with conn.cursor() as cursor:
-            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;")
-        conn.commit()
-        conn.close()
-
 # ----- FUNCIONES AUXILIARES -----
 def sanitizar_curso(curso: str) -> str:
     """Permite letras, números, espacios, guiones y guiones bajos en el nombre de curso."""
@@ -48,108 +39,68 @@ def sanitizar_curso(curso: str) -> str:
     if not re.fullmatch(r"[A-Za-z0-9 _-]{1,32}", curso):
         return ''
     return curso
-
-def asegurar_tablas(conn):
-    """Crea las tablas principales si no existen."""
-    with conn.cursor() as cursor:
-        # Tabla de usuarios
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS usuarios (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            nombre VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-        """)
-        # Tabla de estudiantes
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS estudiantes (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            nombre VARCHAR(255) NOT NULL,
-            curso VARCHAR(50) NOT NULL
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-        """)
-        # Tabla de asistencias
-        cursor.execute("""
-        CREATE TABLE IF NOT EXISTS asistencias (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            estudiante_id INT NOT NULL,
-            fecha DATE NOT NULL,
-            estado ENUM('Presente','Ausente','Tarde','Justificado') NOT NULL,
-            observaciones VARCHAR(500) DEFAULT '',
-            FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id)
-                ON DELETE CASCADE ON UPDATE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-        """)
-        conn.commit()
-
 # ----- RUTAS -----
 @app.route('/')
 def index():
     return render_template('login.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    return render_template('index.html')
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registrar_asistencia():
-    if request.method == 'GET':
-        return render_template('registro.html')
+    if request.method == 'POST':
+        # Datos del formulario
+        curso = sanitizar_curso(request.form.get('curso'))
+        nombre = request.form.get('nombre')
+        fecha = request.form.get('fecha') or date.today().isoformat()
+        estado = request.form.get('estado')
+        observaciones = request.form.get('observaciones', '')
 
-    # Datos del formulario
-    curso = sanitizar_curso(request.form.get('curso'))
-    nombre = request.form.get('nombre')
-    fecha = request.form.get('fecha') or date.today().isoformat()
-    estado = request.form.get('estado')
-    observaciones = request.form.get('observaciones', '')
+        print(f"DEBUG -> curso={curso}, nombre={nombre}, fecha={fecha}, estado={estado}, observaciones={observaciones}")
 
-    # --- DEBUG: Mostrar en consola los datos recibidos ---
-    print(f"DEBUG -> curso={curso}, nombre={nombre}, fecha={fecha}, estado={estado}, observaciones={observaciones}")
+        if not curso or not nombre or not estado:
+            flash("⚠️ Faltan campos obligatorios o el curso tiene caracteres inválidos.")
+            return redirect('/registro')
 
-    if not curso or not nombre or not estado:
-        flash("⚠️ Faltan campos obligatorios o el curso tiene caracteres inválidos.")
-        return redirect('/registro')
+        conn = conectar_db(DB_NAME)
+        if not conn:
+            flash("❌ No se pudo conectar a MySQL. Verifica que XAMPP/MySQL esté iniciado, y revisa host/puerto/usuario/contraseña.")
+            return redirect('/registro')
 
-    conn = conectar_db(DB_NAME)
-    if not conn:
-        flash("❌ No se pudo conectar a MySQL. Verifica que XAMPP/MySQL esté iniciado, y revisa host/puerto/usuario/contraseña.")
-        return redirect('/registro')
-
-    try:
-        asegurar_tablas(conn)
-        with conn.cursor() as cursor:
-            # Verificar si el estudiante ya existe
-            cursor.execute(
-                "SELECT id FROM estudiantes WHERE nombre=%s AND curso=%s",
-                (nombre, curso)
-            )
-            resultado = cursor.fetchone()
-            if resultado:
-                estudiante_id = resultado[0]
-            else:
-                # Insertar estudiante
+        try:
+            with conn.cursor() as cursor:
                 cursor.execute(
-                    "INSERT INTO estudiantes (nombre, curso) VALUES (%s, %s)",
+                    "SELECT id FROM estudiantes WHERE nombre=%s AND curso=%s",
                     (nombre, curso)
                 )
-                estudiante_id = cursor.lastrowid
+                resultado = cursor.fetchone()
+                if resultado:
+                    estudiante_id = resultado[0]
+                else:
+                    cursor.execute(
+                        "INSERT INTO estudiantes (nombre, curso) VALUES (%s, %s)",
+                        (nombre, curso)
+                    )
+                    estudiante_id = cursor.lastrowid
 
-            # Insertar asistencia
-            cursor.execute(
-                "INSERT INTO asistencias (estudiante_id, fecha, estado, observaciones) VALUES (%s, %s, %s, %s)",
-                (estudiante_id, fecha, estado, observaciones)
-            )
-            conn.commit()
-            flash("✅ Asistencia registrada correctamente.")
-    except Exception as e:
-        conn.rollback()
-        print(f"ERROR en registrar_asistencia: {e}")  # --- DEBUG en consola ---
-        flash(f"❌ Error al registrar: {e}")
-    finally:
-        conn.close()
+                cursor.execute(
+                    "INSERT INTO asistencias (estudiante_id, fecha, estado, observaciones) VALUES (%s, %s, %s, %s)",
+                    (estudiante_id, fecha, estado, observaciones)
+                )
+                conn.commit()
+                flash("✅ Asistencia registrada correctamente.")
+        except Exception as e:
+            conn.rollback()
+            print(f"ERROR en registrar_asistencia: {e}")
+            flash(f"❌ Error al registrar: {e}")
+        finally:
+            conn.close()
 
-    return redirect('/registro')
+        return redirect('/registro')
+    # Si es GET, solo muestra el formulario
+    return render_template('index.html')
 
 @app.route('/registrar_usuario', methods=['POST'])
 def registrar_usuario():
@@ -172,7 +123,6 @@ def registrar_usuario():
         return redirect('/registro')
 
     try:
-        asegurar_tablas(conn)
         hashed_password = generate_password_hash(password)
         with conn.cursor() as cursor:
             cursor.execute(
@@ -193,5 +143,5 @@ def registrar_usuario():
 
 # ----- EJECUCIÓN -----
 if __name__ == '__main__':
-    crear_base_datos()  # Se asegura que la base de datos exista
+
     app.run(debug=True)
