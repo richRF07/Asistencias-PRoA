@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil del Estudiante</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="form-box">
+            <h2>Mi Perfil</h2>
+            <form action="{{ url_for('actualizar_perfil') }}" method="POST">
+                <label for="id">ID</label>
+                <input type="text" id="id" name="id" value="{{ estudiante.id }}" readonly>
+
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" value="{{ estudiante.nombre }}" required>
+
+                <label for="apellido">Apellido</label>
+                <input type="text" id="apellido" name="apellido" value="{{ estudiante.apellido }}" required>
+
+                <label for="dni">DNI</label>
+                <input type="text" id="dni" name="dni" value="{{ estudiante.dni }}" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ estudiante.email }}" required>
+
+                <label for="telefono">Teléfono</label>
+                <input type="text" id="telefono" name="telefono" value="{{ estudiante.telefono }}" required>
+
+                <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ estudiante.fecha_nacimiento }}" required>
+
+                <button type="submit" class="btn">Guardar Cambios</button>
+            </form>
+            <a href="{{ url_for('logout') }}" class="btn btn-secundario">Cerrar sesión</a>
+        </div>
+
+        <div class="form-box">
+            <h2>Historial de Asistencias</h2>
+            <table class="tabla-asistencias">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Curso</th>
+                        <th>Estado</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asistencia in asistencias %}
+                    <tr>
+                        <td>{{ asistencia.fecha }}</td>
+                        <td>{{ asistencia.curso }}</td>
+                        <td>{{ asistencia.estado }}</td>
+                        <td>{{ asistencia.observaciones }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">No hay asistencias registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
