@@ -10,7 +10,7 @@ app.secret_key = 'clave_secreta_para_flash'
 # ----- CONFIGURACIÓN DE BASE DE DATOS -----
 DB_HOST = "localhost"
 DB_USER = "root"
-DB_PASSWORD = "root"
+DB_PASSWORD = "admin123"
 DB_NAME = "asistenciasdb"
 DB_PORT = 3307  # Cambiar solo si MySQL usa otro puerto
 
@@ -213,16 +213,23 @@ def registrar_asistencia():
                 )
                 conn.commit()
                 flash("✅ Asistencia registrada correctamente.")
+  # Guardar el estudiante_id en la sesión para mostrar su perfil
+                from flask import session
+                session['estudiante_id'] = estudiante_id
+
         except Exception as e:
             conn.rollback()
             print(f"ERROR en registrar_asistencia: {e}")
             flash(f"❌ Error al registrar: {e}")
+            return redirect('/registro')
         finally:
             conn.close()
 
-        return redirect('/registro')
+        # Redirigir al perfil del estudiante (listado de asistencias)
+        return redirect('/perfil')
     # Si es GET, solo muestra el formulario
     return render_template('index.html')
+
 
 @app.route('/registrar_usuario', methods=['POST'])
 def registrar_usuario():
