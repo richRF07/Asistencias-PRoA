@@ -1,0 +1,159 @@
+/* Fondo general y centrado */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  background: url('/static/img/Schiaretti-Proa-3.jpg') center center / cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Overlay oscuro */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(20, 20, 20, 0.7);
+  z-index: 0;
+}
+
+/* Contenedor principal */
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  z-index: 1;
+  position: relative;
+}
+
+/* Cajas del perfil y asistencias */
+.form-box {
+  background: rgba(40, 40, 40, 0.95);
+  padding: 32px 28px;
+  border-radius: 14px;
+  box-shadow: 0 4px 25px rgba(0, 234, 255, 0.25);
+  min-width: 340px;
+  max-width: 400px;
+  width: 100%;
+  margin-bottom: 24px;
+  backdrop-filter: blur(6px);
+}
+
+.form-box h2 {
+  color: #00eaff;
+  text-align: center;
+  margin-bottom: 18px;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(0, 234, 255, 0.5);
+}
+
+/* Inputs y labels */
+form label {
+  display: block;
+  color: #00eaff;
+  font-weight: 500;
+  margin-top: 10px;
+  margin-bottom: 2px;
+  text-align: left;
+}
+
+form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #555;
+  color: white;
+  font-size: 1rem;
+}
+
+form input:focus {
+  outline: 2px solid #00eaff;
+  background: #666;
+}
+
+/* Botones */
+.btn, .btn.btn-secundario {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 18px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #0099ff, #00eaff);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn:hover, .btn.btn-secundario:hover {
+  background: linear-gradient(90deg, #00eaff, #0099ff);
+  transform: scale(1.04);
+}
+
+.btn.btn-secundario {
+  background: #222;
+  color: #00eaff;
+  border: 1px solid #00eaff;
+  margin-top: 10px;
+}
+
+.btn.btn-secundario:hover {
+  background: #00eaff;
+  color: #222;
+}
+
+/* Tabla de asistencias */
+.tabla-asistencias {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: rgba(30, 30, 30, 0.9);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabla-asistencias th, .tabla-asistencias td {
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.tabla-asistencias th {
+  background: #00eaff;
+  color: #222;
+  font-weight: 600;
+}
+
+.tabla-asistencias tr:nth-child(even) {
+  background: #333;
+}
+
+.tabla-asistencias tr:nth-child(odd) {
+  background: #222;
+}
+
+.tabla-asistencias td {
+  color: #fff;
+  font-size: 0.98rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .form-box {
+    min-width: 90vw;
+    max-width: 98vw;
+  }
+}

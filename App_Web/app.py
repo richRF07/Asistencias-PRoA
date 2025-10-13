@@ -11,7 +11,7 @@ app.secret_key = 'clave_secreta_para_flash'
 DB_HOST = "localhost"
 DB_USER = "root"
 DB_PASSWORD = "admin123"
-DB_NAME = "asistenciasdb"
+DB_NAME = "asistencias_db"
 DB_PORT = 3307  # Cambiar solo si MySQL usa otro puerto
 
 # ----- CONEXIÓN A MYSQL -----
