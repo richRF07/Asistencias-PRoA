@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listado de Alumnos por Curso</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}">
+  <style>
+    /* Ajustes mínimos para rejilla de cursos, manteniendo estética */
+    .cursos-container { max-width: 1100px; width: 95vw; z-index: 1; position: relative; }
+    .grid-cursos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+    .card-curso { background: rgba(40,40,40,0.95); border-radius: 12px; box-shadow: 0 4px 25px rgba(0,234,255,0.25); padding: 18px; }
+    .card-curso h2 { margin: 0 0 12px; color: #00eaff; text-shadow: 0 0 10px rgba(0,234,255,0.5); font-weight: 600; }
+    .lista-alumnos { list-style: none; padding: 0; margin: 0; }
+    .alumno-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(0,234,255,0.12); }
+    .alumno-item:last-child { border-bottom: none; }
+    .alumno-nombre { color: #e9f6ff; }
+    .btn-ver { padding: 8px 10px; border: 1px solid #00eaff; background: #222; color: #00eaff; border-radius: 6px; text-decoration: none; font-weight: 600; }
+    .btn-ver:hover { background: #00eaff; color: #222; }
+    header { text-align: center; margin: 24px 0; }
+    header h1 { color: #00eaff; text-shadow: 0 0 10px rgba(0, 234, 255, 0.8); }
+  </style>
+</head>
+<body>
+  <div class="fondo"></div>
+  <div class="overlay"></div>
+
+  <header>
+    <h1>Listado de Alumnos por Curso</h1>
+  </header>
+
+  <main class="cursos-container">
+    <div class="grid-cursos">
+      {% for numero in ['1','2','3','4','5','6'] %}
+      <section class="card-curso">
+        <h2>{{ numero }}° Año</h2>
+        <ul class="lista-alumnos">
+          {% for alumno in cursos.get(numero, []) %}
+          <li class="alumno-item">
+            <span class="alumno-nombre">{{ alumno.apellido or '' }} {{ alumno.nombre }} {% if alumno.dni %} - DNI {{ alumno.dni }}{% endif %}</span>
+            <a class="btn-ver" href="{{ url_for('perfil_estudiante_publico', estudiante_id=alumno.id) }}">Ver perfil</a>
+          </li>
+          {% else %}
+          <li class="alumno-item"><span class="alumno-nombre">Sin alumnos cargados</span></li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endfor %}
+    </div>
+  </main>
+</body>
+</html>
+

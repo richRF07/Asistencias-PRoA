@@ -75,6 +75,38 @@ def obtener_asistencias_estudiante(estudiante_id):
     finally:
         conn.close()
     return []
+
+# ----- LISTADO POR CURSO -----
+def obtener_estudiantes_por_curso():
+    """Devuelve un diccionario { '1': [estudiantes], ..., '6': [...] }"""
+    conn = conectar_db(DB_NAME)
+    cursos = {str(i): [] for i in range(1, 7)}
+    if not conn:
+        return cursos
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, nombre, apellido, dni, curso
+                FROM estudiantes
+                WHERE curso IN ('1','2','3','4','5','6')
+                ORDER BY CAST(curso AS UNSIGNED), apellido IS NULL, apellido, nombre
+                """
+            )
+            for row in cursor.fetchall():
+                est = {
+                    "id": row[0],
+                    "nombre": row[1],
+                    "apellido": row[2],
+                    "dni": row[3],
+                    "curso": row[4],
+                }
+                key = str(est.get("curso") or "")
+                if key in cursos:
+                    cursos[key].append(est)
+    finally:
+        conn.close()
+    return cursos
 # ----- RUTAS -----
 
 # Ruta para mostrar el perfil del estudiante
@@ -86,6 +118,16 @@ def perfil_estudiante():
         flash('Debes iniciar sesión para ver tu perfil.')
         return redirect(url_for('login'))
     estudiante = obtener_estudiante_por_id(estudiante_id)
+    asistencias = obtener_asistencias_estudiante(estudiante_id)
+    return render_template('perfil_estudiante.html', estudiante=estudiante, asistencias=asistencias)
+
+# Perfil por ID directo (sin requerir sesión) para usar desde "Ver perfil"
+@app.route('/estudiante/<int:estudiante_id>')
+def perfil_estudiante_publico(estudiante_id: int):
+    estudiante = obtener_estudiante_por_id(estudiante_id)
+    if not estudiante:
+        flash('Estudiante no encontrado.')
+        return redirect(url_for('index'))
     asistencias = obtener_asistencias_estudiante(estudiante_id)
     return render_template('perfil_estudiante.html', estudiante=estudiante, asistencias=asistencias)
 
@@ -168,6 +210,12 @@ def login():
             conn.close()
     # Si es GET, muestra el formulario de login
     return render_template('login.html')
+
+# Listado de alumnos por curso (1° a 6°)
+@app.route('/cursos')
+def listar_cursos():
+    cursos_dict = obtener_estudiantes_por_curso()
+    return render_template('listas_cursos.html', cursos=cursos_dict)
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registrar_asistencia():
