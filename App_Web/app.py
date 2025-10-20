@@ -11,7 +11,7 @@ app.secret_key = 'clave_secreta_para_flash'
 DB_HOST = "localhost"
 DB_USER = "root"
 DB_PASSWORD = "admin123"
-DB_NAME = "asistencias_db"
+DB_NAME = "asistencia_db"
 DB_PORT = 3307  # Cambiar solo si MySQL usa otro puerto
 
 # ----- CONEXIÓN A MYSQL -----
@@ -172,7 +172,6 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('index.html')
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -279,8 +278,11 @@ def registrar_asistencia():
     return render_template('index.html')
 
 
-@app.route('/registrar_usuario', methods=['POST'])
-def registrar_usuario():
+@app.route('/registro_usuario', methods=['GET', 'POST'])
+def registro_usuario():
+    if request.method == 'GET':
+        return render_template('registro_usuario.html')
+    
     nombre = request.form.get('nombre')
     email = request.form.get('email')
     password = request.form.get('password')
@@ -288,16 +290,16 @@ def registrar_usuario():
 
     if not nombre or not email or not password or not confirm_password:
         flash("⚠️ Todos los campos son obligatorios.")
-        return redirect('/registro')
+        return redirect('/registro_usuario')
 
     if password != confirm_password:
         flash("⚠️ Las contraseñas no coinciden.")
-        return redirect('/registro')
+        return redirect('/registro_usuario')
 
     conn = conectar_db(DB_NAME)
     if not conn:
         flash("❌ Error de conexión a la base de datos.")
-        return redirect('/registro')
+        return redirect('/registro_usuario')
 
     try:
         hashed_password = generate_password_hash(password)
@@ -317,6 +319,7 @@ def registrar_usuario():
         conn.close()
 
     return redirect('/login')
+
 
 # ----- EJECUCIÓN -----
 if __name__ == '__main__':
