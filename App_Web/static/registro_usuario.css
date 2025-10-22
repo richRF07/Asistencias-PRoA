@@ -1,0 +1,355 @@
+/* Fuente general */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #001f2d; /* color de respaldo si falla la imagen */
+  position: relative;
+}
+
+/* Fondo con imagen completa y efecto overlay */
+.fondo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/static/img/Schiaretti-Proa-3.jpg') center center / cover no-repeat;
+  z-index: -2;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* overlay más oscuro para mejor contraste */
+  z-index: -1;
+}
+
+/* Contenedor principal centrado */
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 450px;
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Caja de registro */
+.login-box {
+  background: rgba(40, 40, 40, 0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 40px 35px;
+  box-shadow: 0 15px 40px rgba(0, 234, 255, 0.3);
+  text-align: center;
+  color: #e9f6ff;
+  border: 2px solid rgba(0, 234, 255, 0.2);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de brillo en el borde */
+.login-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  padding: 2px;
+  background: linear-gradient(45deg, #00eaff, #0099ff, #00eaff);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  z-index: -1;
+}
+
+/* Logo */
+.logo {
+  width: 110px;
+  margin-bottom: 25px;
+  border-radius: 50%;
+  box-shadow: 0 0 25px rgba(0, 234, 255, 0.6);
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* Título */
+.login-box h1 {
+  margin-bottom: 30px;
+  font-weight: 700;
+  font-size: 2em;
+  color: #00eaff;
+  text-shadow: 0 0 15px rgba(0, 234, 255, 0.8);
+  background: linear-gradient(45deg, #00eaff, #0099ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Inputs */
+.input-group {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.input-group label {
+  font-size: 1em;
+  font-weight: 600;
+  color: #00eaff;
+  margin-bottom: 8px;
+  display: block;
+  text-shadow: 0 0 5px rgba(0, 234, 255, 0.3);
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 6px;
+  border-radius: 12px;
+  border: 2px solid rgba(0, 234, 255, 0.3);
+  outline: none;
+  background: rgba(20, 20, 20, 0.8);
+  color: #e9f6ff;
+  font-size: 1em;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  border-color: #00eaff;
+  box-shadow: 0 0 15px rgba(0, 234, 255, 0.4);
+  background: rgba(30, 30, 30, 0.9);
+  transform: translateY(-2px);
+}
+
+.input-group input::placeholder {
+  color: rgba(233, 246, 255, 0.6);
+  font-style: italic;
+}
+
+/* Validación visual de contraseñas */
+.input-group input:valid {
+  border-color: rgba(0, 255, 0, 0.5);
+}
+
+.input-group input:invalid:not(:placeholder-shown) {
+  border-color: rgba(255, 0, 0, 0.5);
+}
+
+/* Botón */
+.btn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00eaff 0%, #0099ff 50%, #00eaff 100%);
+  background-size: 200% 200%;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 234, 255, 0.5);
+  background-position: 100% 0;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn:active {
+  transform: translateY(-1px);
+}
+
+/* Links */
+.registro {
+  margin-top: 25px;
+  font-size: 0.95em;
+  color: #b8eaff;
+  line-height: 1.6;
+}
+
+.registro a {
+  color: #00eaff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.registro a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background: #00eaff;
+  transition: width 0.3s ease;
+}
+
+.registro a:hover {
+  color: #0099ff;
+  text-shadow: 0 0 8px rgba(0, 234, 255, 0.5);
+}
+
+.registro a:hover::after {
+  width: 100%;
+}
+
+/* Flash messages */
+.flash-messages {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.flash-message {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+  font-weight: 500;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.flash-message.success { 
+  background: rgba(0, 255, 0, 0.1); 
+  color: #00ff88; 
+  border-left: 4px solid #00ff88;
+  box-shadow: 0 2px 10px rgba(0, 255, 0, 0.2);
+}
+
+.flash-message.error { 
+  background: rgba(255, 0, 0, 0.1); 
+  color: #ff4444; 
+  border-left: 4px solid #ff4444;
+  box-shadow: 0 2px 10px rgba(255, 0, 0, 0.2);
+}
+
+.flash-message.warning { 
+  background: rgba(255, 165, 0, 0.1); 
+  color: #ffa500; 
+  border-left: 4px solid #ffa500;
+  box-shadow: 0 2px 10px rgba(255, 165, 0, 0.2);
+}
+
+/* Efectos adicionales */
+.login-box {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .login-container {
+    max-width: 90%;
+    padding: 20px 15px;
+  }
+  
+  .login-box {
+    padding: 30px 25px;
+  }
+  
+  .login-box h1 {
+    font-size: 1.6em;
+  }
+  
+  .input-group input {
+    padding: 12px 14px;
+  }
+  
+  .btn {
+    padding: 14px;
+    font-size: 1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    max-width: 95%;
+    padding: 15px 10px;
+  }
+  
+  .login-box {
+    padding: 25px 20px;
+  }
+  
+  .logo {
+    width: 90px;
+  }
+  
+  .login-box h1 {
+    font-size: 1.4em;
+  }
+}
+
+/* Efectos de partículas de fondo (opcional) */
+.login-box::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 234, 255, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: float 20s infinite linear;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-20px) rotate(360deg); }
+}

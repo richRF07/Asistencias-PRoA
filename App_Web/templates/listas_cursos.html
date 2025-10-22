@@ -3,99 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Listado de Alumnos por Curso</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}">
-  <style>
-    /* Ajustes mínimos para rejilla de cursos, manteniendo estética */
-    .cursos-container { max-width: 1100px; width: 95vw; z-index: 1; position: relative; }
-    .grid-cursos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-    .card-curso { background: rgba(40,40,40,0.95); border-radius: 12px; box-shadow: 0 4px 25px rgba(0,234,255,0.25); padding: 18px; }
-    .card-curso h2 { margin: 0 0 12px; color: #00eaff; text-shadow: 0 0 10px rgba(0,234,255,0.5); font-weight: 600; }
-    .lista-alumnos { list-style: none; padding: 0; margin: 0; }
-    .alumno-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(0,234,255,0.12); }
-    .alumno-item:last-child { border-bottom: none; }
-    .alumno-nombre { color: #e9f6ff; }
-    .btn-ver { padding: 8px 10px; border: 1px solid #00eaff; background: #222; color: #00eaff; border-radius: 6px; text-decoration: none; font-weight: 600; }
-    .btn-ver:hover { background: #00eaff; color: #222; }
-    
-    /* Botonera de acciones principales */
-    .botonera-acciones {
-      display: flex;
-      gap: 15px;
-      justify-content: center;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
-    
-    .btn-accion-principal {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      text-decoration: none;
-      border: none;
-      border-radius: 25px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-    }
-    
-    .btn-accion-principal:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    }
-    
-    .icono {
-      font-size: 1.2em;
-    }
-    
-    /* Mejoras en la lista de alumnos */
-    .alumno-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    
-    .alumno-dni {
-      font-size: 0.85em;
-      color: #aaa;
-    }
-    
-    .botones-alumno {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    
-    .btn-info {
-      padding: 6px 10px;
-      border: 1px solid #ffa500;
-      background: #222;
-      color: #ffa500;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.9em;
-    }
-    
-    .btn-info:hover {
-      background: #ffa500;
-      color: #222;
-    }
-    
-    .icono-btn {
-      margin-right: 4px;
-    }
-    
-    header { text-align: center; margin: 24px 0; }
-    header h1 { color: #00eaff; text-shadow: 0 0 10px rgba(0, 234, 255, 0.8); }
-  </style>
+  <title>Listado de Alumnos por Curso - PROA</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='listas_cursos.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="fondo"></div>
@@ -112,7 +22,24 @@
   </nav>
 
   <header>
-    <h1>Listado de Alumnos por Curso</h1>
+    <h1>📚 Listado de Alumnos por Curso</h1>
+    
+    <!-- Mensajes flash -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for message in messages %}
+            <div class="flash-message 
+              {% if '✅' in message %} success 
+              {% elif '❌' in message %} error 
+              {% elif 'ℹ️' in message %} info
+              {% else %} warning {% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
     
     <!-- Botonera de acciones rápidas -->
     <div class="botonera-acciones">
@@ -120,16 +47,67 @@
         <span class="icono">📝</span>
         Registrar Nueva Asistencia
       </a>
-      <a href="{{ url_for('perfil_estudiante') }}" class="btn-accion-principal">
-        <span class="icono">👤</span>
-        Mi Perfil
-      </a>
-      <button onclick="filtrarCursos()" class="btn-accion-principal">
+      <button onclick="mostrarFiltros()" class="btn-accion-principal">
         <span class="icono">🔍</span>
         Filtrar Cursos
       </button>
+      <a href="{{ url_for('cargar_estudiantes_4to') }}" class="btn-accion-principal">
+        <span class="icono">📚</span>
+        Cargar 4° Año
+      </a>
     </div>
   </header>
+
+  <!-- Panel de filtros -->
+  <div id="panel-filtros" class="panel-filtros" style="display: none;">
+    <div class="filtros-container">
+      <h3>🔍 Filtros de Búsqueda</h3>
+      
+      <div class="filtros-row">
+        <div class="filtro-group">
+          <label for="buscar-nombre">Buscar por nombre/apellido:</label>
+          <input type="text" id="buscar-nombre" placeholder="Ej: Juan, Pérez, Barrionuevo...">
+        </div>
+        
+        <div class="filtro-group">
+          <label for="filtro-curso">Filtrar por curso:</label>
+          <select id="filtro-curso">
+            <option value="">Todos los cursos</option>
+            <option value="1">1° Año</option>
+            <option value="2">2° Año</option>
+            <option value="3">3° Año</option>
+            <option value="4">4° Año</option>
+            <option value="5">5° Año</option>
+            <option value="6">6° Año</option>
+          </select>
+        </div>
+        
+        <div class="filtro-group">
+          <label for="ordenar-por">Ordenar por:</label>
+          <select id="ordenar-por">
+            <option value="apellido">Apellido</option>
+            <option value="nombre">Nombre</option>
+            <option value="curso">Curso</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="filtros-botones">
+        <button onclick="aplicarFiltros()" class="btn-filtrar">
+          <span class="icono">🔍</span>
+          Aplicar Filtros
+        </button>
+        <button onclick="limpiarFiltros()" class="btn-limpiar">
+          <span class="icono">🗑️</span>
+          Limpiar
+        </button>
+        <button onclick="cerrarFiltros()" class="btn-cerrar">
+          <span class="icono">❌</span>
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
 
   <main class="cursos-container">
     <div class="grid-cursos">
@@ -150,7 +128,7 @@
                 <span class="icono-btn">👁️</span>
                 Ver Perfil
               </a>
-              <button class="btn-info" onclick="mostrarInfoAlumno({{ alumno.id }})">
+              <button class="btn-info" data-estudiante-id="{{ alumno.id }}">
                 <span class="icono-btn">ℹ️</span>
                 Info
               </button>
@@ -182,6 +160,11 @@
       const modal = document.getElementById('modal-info');
       const contenido = document.getElementById('info-contenido');
       
+      if (!modal || !contenido) {
+        console.error('Modal o contenido no encontrado');
+        return;
+      }
+      
       contenido.innerHTML = `
         <p><strong>ID:</strong> ${estudianteId}</p>
         <p><strong>Estado:</strong> Activo</p>
@@ -199,7 +182,164 @@
     
     // Función para cerrar el modal
     function cerrarModal() {
-      document.getElementById('modal-info').style.display = 'none';
+      const modal = document.getElementById('modal-info');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
+    // Función para mostrar/ocultar filtros
+    function mostrarFiltros() {
+      const panel = document.getElementById('panel-filtros');
+      if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+    
+    function cerrarFiltros() {
+      document.getElementById('panel-filtros').style.display = 'none';
+    }
+    
+    // Función para aplicar filtros
+    function aplicarFiltros() {
+      const buscarNombre = document.getElementById('buscar-nombre').value.toLowerCase();
+      const filtroCurso = document.getElementById('filtro-curso').value;
+      const ordenarPor = document.getElementById('ordenar-por').value;
+      
+      // Obtener todas las tarjetas de curso
+      const cardsCursos = document.querySelectorAll('.card-curso');
+      let totalMostrados = 0;
+      
+      cardsCursos.forEach(card => {
+        const cursoNumero = card.querySelector('h2').textContent.replace('° Año', '');
+        const listaAlumnos = card.querySelector('.lista-alumnos');
+        const alumnos = listaAlumnos.querySelectorAll('.alumno-item');
+        let alumnosVisibles = 0;
+        
+        // Filtrar por curso
+        if (filtroCurso && cursoNumero !== filtroCurso) {
+          card.style.display = 'none';
+          return;
+        } else {
+          card.style.display = 'block';
+        }
+        
+        // Filtrar y ordenar alumnos
+        const alumnosArray = Array.from(alumnos);
+        
+        // Filtrar por nombre/apellido
+        const alumnosFiltrados = alumnosArray.filter(alumno => {
+          const nombreCompleto = alumno.querySelector('.alumno-nombre').textContent.toLowerCase();
+          const dni = alumno.querySelector('.alumno-dni') ? alumno.querySelector('.alumno-dni').textContent.toLowerCase() : '';
+          
+          if (!buscarNombre) return true;
+          return nombreCompleto.includes(buscarNombre) || dni.includes(buscarNombre);
+        });
+        
+        // Ordenar alumnos
+        alumnosFiltrados.sort((a, b) => {
+          const nombreA = a.querySelector('.alumno-nombre').textContent.toLowerCase();
+          const nombreB = b.querySelector('.alumno-nombre').textContent.toLowerCase();
+          
+          switch(ordenarPor) {
+            case 'nombre':
+              return nombreA.localeCompare(nombreB);
+            case 'curso':
+              return cursoNumero.localeCompare(cursoNumero);
+            default: // apellido
+              return nombreA.localeCompare(nombreB);
+          }
+        });
+        
+        // Mostrar/ocultar alumnos
+        alumnosArray.forEach(alumno => {
+          if (alumnosFiltrados.includes(alumno)) {
+            alumno.style.display = 'flex';
+            alumnosVisibles++;
+          } else {
+            alumno.style.display = 'none';
+          }
+        });
+        
+        // Mostrar mensaje si no hay alumnos visibles
+        const mensajeSinAlumnos = card.querySelector('.sin-alumnos');
+        if (mensajeSinAlumnos) {
+          mensajeSinAlumnos.remove();
+        }
+        
+        if (alumnosVisibles === 0) {
+          const mensaje = document.createElement('li');
+          mensaje.className = 'sin-alumnos';
+          mensaje.innerHTML = '<span class="alumno-nombre">No se encontraron estudiantes</span>';
+          listaAlumnos.appendChild(mensaje);
+        }
+        
+        totalMostrados += alumnosVisibles;
+      });
+      
+      // Mostrar resumen de resultados
+      mostrarResumenFiltros(totalMostrados, buscarNombre, filtroCurso);
+    }
+    
+    // Función para limpiar filtros
+    function limpiarFiltros() {
+      document.getElementById('buscar-nombre').value = '';
+      document.getElementById('filtro-curso').value = '';
+      document.getElementById('ordenar-por').value = 'apellido';
+      
+      // Mostrar todos los alumnos y cursos
+      const cardsCursos = document.querySelectorAll('.card-curso');
+      cardsCursos.forEach(card => {
+        card.style.display = 'block';
+        const alumnos = card.querySelectorAll('.alumno-item');
+        alumnos.forEach(alumno => {
+          alumno.style.display = 'flex';
+        });
+        
+        // Remover mensaje de sin alumnos
+        const mensajeSinAlumnos = card.querySelector('.sin-alumnos');
+        if (mensajeSinAlumnos) {
+          mensajeSinAlumnos.remove();
+        }
+      });
+      
+      // Limpiar resumen
+      const resumen = document.getElementById('resumen-filtros');
+      if (resumen) {
+        resumen.remove();
+      }
+    }
+    
+    // Función para mostrar resumen de filtros
+    function mostrarResumenFiltros(total, busqueda, curso) {
+      // Remover resumen anterior
+      const resumenAnterior = document.getElementById('resumen-filtros');
+      if (resumenAnterior) {
+        resumenAnterior.remove();
+      }
+      
+      // Crear nuevo resumen
+      const resumen = document.createElement('div');
+      resumen.id = 'resumen-filtros';
+      resumen.className = 'resumen-filtros';
+      
+      let textoResumen = `🔍 Mostrando ${total} estudiante${total !== 1 ? 's' : ''}`;
+      if (busqueda) textoResumen += ` que contienen "${busqueda}"`;
+      if (curso) textoResumen += ` del curso ${curso}°`;
+      
+      resumen.innerHTML = `
+        <div class="resumen-content">
+          <span class="resumen-texto">${textoResumen}</span>
+          <button onclick="limpiarFiltros()" class="btn-limpiar-resumen">Limpiar filtros</button>
+        </div>
+      `;
+      
+      // Insertar después del header
+      const header = document.querySelector('header');
+      header.insertAdjacentElement('afterend', resumen);
     }
     
     // Función para filtrar cursos (placeholder)
@@ -210,70 +350,24 @@
     // Cerrar modal al hacer clic fuera de él
     window.onclick = function(event) {
       const modal = document.getElementById('modal-info');
-      if (event.target == modal) {
+      if (event.target === modal) {
         modal.style.display = 'none';
       }
     }
+    
+    // Mejorar la función onclick para usar data attributes
+    document.addEventListener('DOMContentLoaded', function() {
+      const infoButtons = document.querySelectorAll('.btn-info');
+      infoButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const estudianteId = this.getAttribute('data-estudiante-id');
+          if (estudianteId) {
+            mostrarInfoAlumno(estudianteId);
+          }
+        });
+      });
+    });
   </script>
-
-  <style>
-    /* Estilos para el modal */
-    .modal {
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(5px);
-    }
-    
-    .modal-content {
-      background: rgba(40, 40, 40, 0.95);
-      margin: 15% auto;
-      padding: 20px;
-      border-radius: 12px;
-      width: 80%;
-      max-width: 500px;
-      box-shadow: 0 4px 25px rgba(0, 234, 255, 0.25);
-      position: relative;
-    }
-    
-    .close {
-      color: #00eaff;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-      position: absolute;
-      right: 15px;
-      top: 10px;
-    }
-    
-    .close:hover {
-      color: #ff4444;
-    }
-    
-    .modal-content h3 {
-      color: #00eaff;
-      margin-bottom: 15px;
-    }
-    
-    .modal-content p {
-      color: #e9f6ff;
-      margin: 10px 0;
-    }
-    
-    .modal-content ul {
-      color: #e9f6ff;
-      margin-left: 20px;
-    }
-    
-    .modal-content li {
-      margin: 5px 0;
-    }
-  </style>
 </body>
 </html>
 
