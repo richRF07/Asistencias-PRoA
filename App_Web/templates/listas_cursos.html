@@ -18,6 +18,81 @@
     .alumno-nombre { color: #e9f6ff; }
     .btn-ver { padding: 8px 10px; border: 1px solid #00eaff; background: #222; color: #00eaff; border-radius: 6px; text-decoration: none; font-weight: 600; }
     .btn-ver:hover { background: #00eaff; color: #222; }
+    
+    /* Botonera de acciones principales */
+    .botonera-acciones {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    
+    .btn-accion-principal {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border: none;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-accion-principal:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+    
+    .icono {
+      font-size: 1.2em;
+    }
+    
+    /* Mejoras en la lista de alumnos */
+    .alumno-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .alumno-dni {
+      font-size: 0.85em;
+      color: #aaa;
+    }
+    
+    .botones-alumno {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .btn-info {
+      padding: 6px 10px;
+      border: 1px solid #ffa500;
+      background: #222;
+      color: #ffa500;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+    
+    .btn-info:hover {
+      background: #ffa500;
+      color: #222;
+    }
+    
+    .icono-btn {
+      margin-right: 4px;
+    }
+    
     header { text-align: center; margin: 24px 0; }
     header h1 { color: #00eaff; text-shadow: 0 0 10px rgba(0, 234, 255, 0.8); }
   </style>
@@ -26,16 +101,34 @@
   <div class="fondo"></div>
   <div class="overlay"></div>
 
-  <!-- Navegación -->
-  <nav style="background: #2fccf7; padding: 10px; text-align: center;">
-    <a href="/login" style="color: white; text-decoration: none; margin: 0 15px;">Login</a>
-    <a href="/registro_usuario" style="color: white; text-decoration: none; margin: 0 15px;">Registro Usuario</a>
-    <a href="/registro" style="color: white; text-decoration: none; margin: 0 15px;">Registro Asistencia</a>
-    <a href="/cursos" style="color: white; text-decoration: none; margin: 0 15px;">Ver Cursos</a>
+  <!-- Navegación Principal -->
+  <nav class="nav-principal">
+    <div class="nav-container">
+      <a href="{{ url_for('perfil_estudiante') }}" class="nav-link">Mi Perfil</a>
+      <a href="{{ url_for('listar_cursos') }}" class="nav-link active">Ver Cursos</a>
+      <a href="{{ url_for('registrar_asistencia') }}" class="nav-link">Registrar Asistencia</a>
+      <a href="{{ url_for('logout') }}" class="nav-link logout">Cerrar Sesión</a>
+    </div>
   </nav>
 
   <header>
     <h1>Listado de Alumnos por Curso</h1>
+    
+    <!-- Botonera de acciones rápidas -->
+    <div class="botonera-acciones">
+      <a href="{{ url_for('registrar_asistencia') }}" class="btn-accion-principal">
+        <span class="icono">📝</span>
+        Registrar Nueva Asistencia
+      </a>
+      <a href="{{ url_for('perfil_estudiante') }}" class="btn-accion-principal">
+        <span class="icono">👤</span>
+        Mi Perfil
+      </a>
+      <button onclick="filtrarCursos()" class="btn-accion-principal">
+        <span class="icono">🔍</span>
+        Filtrar Cursos
+      </button>
+    </div>
   </header>
 
   <main class="cursos-container">
@@ -46,8 +139,22 @@
         <ul class="lista-alumnos">
           {% for alumno in cursos.get(numero, []) %}
           <li class="alumno-item">
-            <span class="alumno-nombre">{{ alumno.apellido or '' }} {{ alumno.nombre }} {% if alumno.dni %} - DNI {{ alumno.dni }}{% endif %}</span>
-            <a class="btn-ver" href="{{ url_for('perfil_estudiante_publico', estudiante_id=alumno.id) }}">Ver perfil</a>
+            <div class="alumno-info">
+              <span class="alumno-nombre">{{ alumno.apellido or '' }} {{ alumno.nombre }}</span>
+              {% if alumno.dni %}
+                <span class="alumno-dni">DNI: {{ alumno.dni }}</span>
+              {% endif %}
+            </div>
+            <div class="botones-alumno">
+              <a class="btn-ver" href="{{ url_for('perfil_estudiante_publico', estudiante_id=alumno.id) }}">
+                <span class="icono-btn">👁️</span>
+                Ver Perfil
+              </a>
+              <button class="btn-info" onclick="mostrarInfoAlumno({{ alumno.id }})">
+                <span class="icono-btn">ℹ️</span>
+                Info
+              </button>
+            </div>
           </li>
           {% else %}
           <li class="alumno-item"><span class="alumno-nombre">Sin alumnos cargados</span></li>
@@ -57,6 +164,116 @@
       {% endfor %}
     </div>
   </main>
+
+  <!-- Modal para información del alumno -->
+  <div id="modal-info" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarModal()">&times;</span>
+      <h3>Información del Estudiante</h3>
+      <div id="info-contenido"></div>
+    </div>
+  </div>
+
+  <script>
+    // Función para mostrar información del alumno
+    function mostrarInfoAlumno(estudianteId) {
+      // Aquí podrías hacer una petición AJAX para obtener más información
+      // Por ahora mostraremos información básica
+      const modal = document.getElementById('modal-info');
+      const contenido = document.getElementById('info-contenido');
+      
+      contenido.innerHTML = `
+        <p><strong>ID:</strong> ${estudianteId}</p>
+        <p><strong>Estado:</strong> Activo</p>
+        <p><strong>Última asistencia:</strong> Reciente</p>
+        <p><strong>Acciones disponibles:</strong></p>
+        <ul>
+          <li>Ver perfil completo</li>
+          <li>Ver historial de asistencias</li>
+          <li>Registrar nueva asistencia</li>
+        </ul>
+      `;
+      
+      modal.style.display = 'block';
+    }
+    
+    // Función para cerrar el modal
+    function cerrarModal() {
+      document.getElementById('modal-info').style.display = 'none';
+    }
+    
+    // Función para filtrar cursos (placeholder)
+    function filtrarCursos() {
+      alert('Función de filtrado próximamente disponible');
+    }
+    
+    // Cerrar modal al hacer clic fuera de él
+    window.onclick = function(event) {
+      const modal = document.getElementById('modal-info');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilos para el modal */
+    .modal {
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+      background: rgba(40, 40, 40, 0.95);
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 80%;
+      max-width: 500px;
+      box-shadow: 0 4px 25px rgba(0, 234, 255, 0.25);
+      position: relative;
+    }
+    
+    .close {
+      color: #00eaff;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      right: 15px;
+      top: 10px;
+    }
+    
+    .close:hover {
+      color: #ff4444;
+    }
+    
+    .modal-content h3 {
+      color: #00eaff;
+      margin-bottom: 15px;
+    }
+    
+    .modal-content p {
+      color: #e9f6ff;
+      margin: 10px 0;
+    }
+    
+    .modal-content ul {
+      color: #e9f6ff;
+      margin-left: 20px;
+    }
+    
+    .modal-content li {
+      margin: 5px 0;
+    }
+  </style>
 </body>
 </html>
 

@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil del Estudiante</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
-   <link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}">
 </head>
 <body>
-    <!-- Navegación -->
-    <nav style="background: #2fccf7; padding: 10px; text-align: center;">
-        <a href="/login" style="color: white; text-decoration: none; margin: 0 15px;">Login</a>
-        <a href="/registro_usuario" style="color: white; text-decoration: none; margin: 0 15px;">Registro Usuario</a>
-        <a href="/registro" style="color: white; text-decoration: none; margin: 0 15px;">Registro Asistencia</a>
-        <a href="/cursos" style="color: white; text-decoration: none; margin: 0 15px;">Ver Cursos</a>
+    <!-- Navegación Principal -->
+    <nav class="nav-principal">
+        <div class="nav-container">
+            <a href="{{ url_for('perfil_estudiante') }}" class="nav-link active">Mi Perfil</a>
+            <a href="{{ url_for('listar_cursos') }}" class="nav-link">Ver Cursos</a>
+            <a href="{{ url_for('registrar_asistencia') }}" class="nav-link">Registrar Asistencia</a>
+            <a href="{{ url_for('logout') }}" class="nav-link logout">Cerrar Sesión</a>
+        </div>
     </nav>
     
     <div class="container">
@@ -43,7 +44,12 @@
 
                 <button type="submit" class="btn">Guardar Cambios</button>
             </form>
-            <a href="{{ url_for('logout') }}" class="btn btn-secundario">Cerrar sesión</a>
+            
+            <!-- Botonera de acciones del perfil -->
+            <div class="botonera-perfil">
+                <a href="{{ url_for('listar_cursos') }}" class="btn btn-accion">Ver Todos los Cursos</a>
+                <a href="{{ url_for('registrar_asistencia') }}" class="btn btn-accion">Registrar Nueva Asistencia</a>
+            </div>
         </div>
 
         <div class="form-box">

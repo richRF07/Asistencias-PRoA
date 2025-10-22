@@ -6,9 +6,11 @@ body {
   min-height: 100vh;
   background: url('/static/img/Schiaretti-Proa-3.jpg') center center / cover no-repeat;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
   position: relative;
+  padding-top: 80px;
 }
 
 /* Overlay oscuro */
@@ -145,6 +147,92 @@ form input:focus {
   font-size: 0.98rem;
 }
 
+/* Navegación Principal */
+.nav-principal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(47, 204, 247, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  padding: 15px 0;
+  box-shadow: 0 2px 20px rgba(0, 234, 255, 0.3);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 234, 255, 0.4);
+}
+
+.nav-link.active {
+  background: rgba(0, 234, 255, 0.3);
+  border-color: #00eaff;
+  color: #00eaff;
+  text-shadow: 0 0 10px rgba(0, 234, 255, 0.5);
+}
+
+.nav-link.logout {
+  background: rgba(255, 0, 0, 0.2);
+  border-color: #ff4444;
+}
+
+.nav-link.logout:hover {
+  background: rgba(255, 0, 0, 0.3);
+  color: #ff4444;
+}
+
+/* Botonera del perfil */
+.botonera-perfil {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-accion {
+  flex: 1;
+  min-width: 200px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-accion:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .container {
@@ -155,5 +243,23 @@ form input:focus {
   .form-box {
     min-width: 90vw;
     max-width: 98vw;
+  }
+  
+  .nav-container {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .nav-link {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .botonera-perfil {
+    flex-direction: column;
+  }
+  
+  .btn-accion {
+    min-width: 100%;
   }
 }

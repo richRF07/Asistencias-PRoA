@@ -12,7 +12,7 @@ DB_HOST = "localhost"
 DB_USER = "root"
 DB_PASSWORD = "admin123"
 DB_NAME = "asistencia_db"
-DB_PORT = 3307  # Cambiar solo si MySQL usa otro puerto
+DB_PORT = 3306  # Cambiar solo si MySQL usa otro puerto
 
 # ----- CONEXIÓN A MYSQL -----
 def conectar_db(db_name=None):
