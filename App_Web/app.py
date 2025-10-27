@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, session, url_for
 from datetime import date
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,7 +11,7 @@ app.secret_key = 'clave_secreta_para_flash'
 DB_HOST = "localhost"
 DB_USER = "root"
 DB_PASSWORD = "admin123"
-DB_NAME = "asistencias_db"
+DB_NAME = "asistencia_db"
 DB_PORT = 3307  # Cambiar solo si MySQL usa otro puerto
 
 # ----- CONEXIÓN A MYSQL -----
@@ -84,12 +84,12 @@ def obtener_estudiantes_por_curso():
                         "email": est[4] or "",
                     })
                 
-                # Usar el id del curso como clave
-                cursos_dict[str(curso_id)] = {
-                    "id": curso_id,
-                    "nombre": curso_nombre,
-                    "estudiantes": estudiantes_list
-                }
+                # Extraer el número del curso del nombre (ej: "1° Año" -> "1")
+                curso_numero = str(curso_id)
+                
+                # Usar el número del curso como clave para compatibilidad con el template
+                # La plantilla espera: cursos['1'], cursos['2'], etc.
+                cursos_dict[curso_numero] = estudiantes_list
                 
                 print(f"   Curso {curso_id} ({curso_nombre}): {len(estudiantes_list)} estudiantes")
             
@@ -110,10 +110,11 @@ def obtener_estudiante_por_id(estudiante_id):
         return None
     try:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT id, nombre, apellido, dni, email, telefono, fecha_nacimiento FROM estudiantes WHERE id=%s", (estudiante_id,))
+            # Campos de la tabla estudiantes: id_Est, Apellido, nombre, DNI, email_Est, curso_id
+            cursor.execute("SELECT id_Est, nombre, Apellido, DNI, email_Est FROM estudiantes WHERE id_Est=%s", (estudiante_id,))
             row = cursor.fetchone()
             if row:
-                keys = ["id", "nombre", "apellido", "dni", "email", "telefono", "fecha_nacimiento"]
+                keys = ["id", "nombre", "apellido", "dni", "email"]
                 return dict(zip(keys, row))
     finally:
         conn.close()
@@ -125,10 +126,11 @@ def obtener_asistencias_estudiante(estudiante_id):
         return []
     try:
         with conn.cursor() as cursor:
+            # JOIN usando el campo correcto de estudiantes (id_Est) y obtener el curso desde curso_id
             cursor.execute("""
-                SELECT a.fecha, e.curso, a.estado, a.observaciones
+                SELECT a.fecha, e.curso_id, a.estado, a.observaciones
                 FROM asistencias a
-                JOIN estudiantes e ON a.estudiante_id = e.id
+                JOIN estudiantes e ON a.estudiante_id = e.id_Est
                 WHERE a.estudiante_id = %s
                 ORDER BY a.fecha DESC
             """, (estudiante_id,))
@@ -141,7 +143,6 @@ def obtener_asistencias_estudiante(estudiante_id):
 # ----- RUTAS -----
 
 # Ruta para mostrar el perfil del estudiante
-from flask import session, url_for
 @app.route('/perfil')
 def perfil_estudiante():
     estudiante_id = session.get('estudiante_id')
@@ -152,6 +153,16 @@ def perfil_estudiante():
     asistencias = obtener_asistencias_estudiante(estudiante_id)
     return render_template('perfil_estudiante.html', estudiante=estudiante, asistencias=asistencias)
 
+# Perfil por ID directo (sin requerir sesión) para usar desde "Ver perfil"
+@app.route('/estudiante/<int:estudiante_id>')
+def perfil_estudiante_publico(estudiante_id: int):
+    estudiante = obtener_estudiante_por_id(estudiante_id)
+    if not estudiante:
+        flash('Estudiante no encontrado.')
+        return redirect(url_for('listar_cursos'))
+    asistencias = obtener_asistencias_estudiante(estudiante_id)
+    return render_template('perfil_estudiante.html', estudiante=estudiante, asistencias=asistencias)
+
 # Ruta para actualizar datos del perfil
 @app.route('/actualizar_perfil', methods=['POST'])
 def actualizar_perfil():
@@ -159,7 +170,7 @@ def actualizar_perfil():
     if not estudiante_id:
         flash('Debes iniciar sesión para modificar tu perfil.')
         return redirect(url_for('login'))
-    campos = ['nombre', 'apellido', 'dni', 'email', 'telefono', 'fecha_nacimiento']
+    campos = ['nombre']
     datos = {campo: request.form.get(campo) for campo in campos}
     conn = conectar_db(DB_NAME)
     if not conn:
@@ -167,10 +178,11 @@ def actualizar_perfil():
         return redirect(url_for('perfil_estudiante'))
     try:
         with conn.cursor() as cursor:
+            # Campos de la tabla: id, nombre, curso_id (según asistencia_db.sql)
             cursor.execute("""
-                UPDATE estudiantes SET nombre=%s, apellido=%s, dni=%s, email=%s, telefono=%s, fecha_nacimiento=%s
+                UPDATE estudiantes SET nombre=%s
                 WHERE id=%s
-            """, (datos['nombre'], datos['apellido'], datos['dni'], datos['email'], datos['telefono'], datos['fecha_nacimiento'], estudiante_id))
+            """, (datos['nombre'], estudiante_id))
             conn.commit()
         flash('✅ Perfil actualizado correctamente.')
     except Exception as e:
@@ -210,13 +222,18 @@ def listar_cursos():
         flash(f"❌ Error al cargar la lista de cursos: {e}")
         return render_template('listas_cursos.html', cursos={})
 
+# Ruta para cargar estudiantes de 4° año (placeholder)
+@app.route('/cargar_4to')
+def cargar_estudiantes_4to():
+    flash("ℹ️ Función de carga de estudiantes de 4° año en desarrollo")
+    return redirect(url_for('listar_cursos'))
+
 @app.route('/')
 def index():
     return render_template('login.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('index.html')
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -230,19 +247,15 @@ def login():
         try:
             with conn.cursor() as cursor:
                 # Buscar usuario en la tabla usuarios
+                # Campos de la tabla: id, nombre, email, password, fecha_registro
                 cursor.execute("SELECT id, password FROM usuarios WHERE email=%s", (email,))
                 user = cursor.fetchone()
                 if user and check_password_hash(user[1], password):
-                    # Buscar estudiante correspondiente (por email)
-                    cursor.execute("SELECT id FROM estudiantes WHERE email=%s", (email,))
-                    estudiante = cursor.fetchone()
-                    if estudiante:
-                        session['estudiante_id'] = estudiante[0]
-                        flash('Bienvenido/a!')
-                        return redirect(url_for('perfil_estudiante'))
-                    else:
-                        flash('No se encontró un estudiante asociado a este email.')
-                        return redirect(url_for('login'))
+                    # Usuario autenticado correctamente
+                    session['usuario_id'] = user[0]
+                    session['email'] = email
+                    flash('Bienvenido/a!')
+                    return redirect(url_for('listar_cursos'))
                 else:
                     flash('Email o contraseña incorrectos.')
                     return redirect(url_for('login'))
@@ -255,7 +268,7 @@ def login():
     # Si es GET, muestra el formulario de login
     return render_template('login.html')
 
-|1@app.route('/registro', methods=['GET', 'POST'])
+@app.route('/registro', methods=['GET', 'POST'])
 def registrar_asistencia():
     if request.method == 'POST':
         # Datos del formulario
@@ -279,28 +292,40 @@ def registrar_asistencia():
 
         try:
             with conn.cursor() as cursor:
+                # Campos de la tabla estudiantes: id_Est, Apellido, nombre, DNI, curso_id
+                # Separar nombre completo en nombre y apellido
+                partes_nombre = nombre.strip().split()
+                if len(partes_nombre) >= 2:
+                    nombre_est = partes_nombre[0]
+                    apellido_est = " ".join(partes_nombre[1:])
+                else:
+                    nombre_est = nombre
+                    apellido_est = ""
+                
+                # Buscar estudiante existente
                 cursor.execute(
-                    "SELECT id FROM estudiantes WHERE nombre=%s AND curso=%s AND dni=%s",
-                    (nombre, curso, dni)
+                    "SELECT id_Est FROM estudiantes WHERE nombre=%s AND DNI=%s",
+                    (nombre_est, dni)
                 )
                 resultado = cursor.fetchone()
                 if resultado:
                     estudiante_id = resultado[0]
                 else:
+                    # Crear nuevo estudiante
                     cursor.execute(
-                        "INSERT INTO estudiantes (nombre, curso, dni) VALUES (%s, %s, %s)",
-                        (nombre, curso, dni)
+                        "INSERT INTO estudiantes (nombre, Apellido, DNI, curso_id) VALUES (%s, %s, %s, %s)",
+                        (nombre_est, apellido_est, dni, curso)
                     )
                     estudiante_id = cursor.lastrowid
 
+                # Registrar la asistencia
                 cursor.execute(
                     "INSERT INTO asistencias (estudiante_id, fecha, estado, observaciones) VALUES (%s, %s, %s, %s)",
                     (estudiante_id, fecha, estado, observaciones)
                 )
                 conn.commit()
                 flash("✅ Asistencia registrada correctamente.")
-  # Guardar el estudiante_id en la sesión para mostrar su perfil
-                from flask import session
+                # Guardar el estudiante_id en la sesión para mostrar su perfil
                 session['estudiante_id'] = estudiante_id
 
         except Exception as e:
@@ -340,6 +365,8 @@ def registrar_usuario():
     try:
         hashed_password = generate_password_hash(password)
         with conn.cursor() as cursor:
+            # Campos de la tabla: id, nombre, email, password, fecha_registro
+            # fecha_registro es automática (DEFAULT CURRENT_TIMESTAMP)
             cursor.execute(
                 "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)",
                 (nombre, email, hashed_password)
