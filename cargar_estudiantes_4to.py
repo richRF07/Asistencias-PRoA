@@ -138,3 +138,5 @@ except ImportError as e:
     print("💡 Asegúrate de estar en el directorio correcto")
 except Exception as e:
     print(f"❌ Error inesperado: {e}")
+
+

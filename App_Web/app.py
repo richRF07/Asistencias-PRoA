@@ -11,8 +11,8 @@ app.secret_key = 'clave_secreta_para_flash'
 DB_HOST = "localhost"
 DB_USER = "root"
 DB_PASSWORD = "admin123"
-DB_NAME = "asistencia_db"
-DB_PORT = 3306  # Puerto correcto según el archivo SQL
+DB_NAME = "asistencias_db"
+DB_PORT = 3307  # Cambiar solo si MySQL usa otro puerto
 
 # ----- CONEXIÓN A MYSQL -----
 def conectar_db(db_name=None):
@@ -24,23 +24,11 @@ def conectar_db(db_name=None):
             password=DB_PASSWORD,
             database=db_name,
             port=DB_PORT,
-            charset='utf8mb4',
-            autocommit=True,
-            connect_timeout=10
+            charset='utf8mb4'
         )
         return conn
     except pymysql.err.OperationalError as e:
-        error_msg = f"Error de conexión a MySQL: {e}"
-        print(error_msg)
-        print(f"Configuración: {DB_HOST}:{DB_PORT}, usuario: {DB_USER}, BD: {db_name}")
-        print("💡 Verifica que:")
-        print("   - XAMPP/WAMP esté ejecutándose")
-        print("   - MySQL esté iniciado en el puerto 3307")
-        print("   - Las credenciales sean correctas")
-        print("   - La base de datos 'asistencia_db' exista")
-        return None
-    except Exception as e:
-        print(f"Error inesperado de conexión: {e}")
+        print(f"Error de conexión: {e}")
         return None
 
 # ----- FUNCIONES AUXILIARES -----
@@ -51,6 +39,69 @@ def sanitizar_curso(curso: str) -> str:
     if not re.fullmatch(r"[A-Za-z0-9 _-]{1,32}", curso):
         return ''
     return curso
+
+# ----- LISTADO POR CURSO -----
+def obtener_estudiantes_por_curso():
+    """Devuelve un diccionario con cursos y sus estudiantes"""
+    conn = conectar_db(DB_NAME)
+    
+    if not conn:
+        print("❌ No se pudo conectar a la base de datos para obtener estudiantes por curso")
+        return {}
+    
+    try:
+        with conn.cursor() as cursor:
+            # Primero obtener todos los cursos de la tabla cursos
+            cursor.execute("SELECT id, nombre FROM cursos ORDER BY id")
+            cursos_db = cursor.fetchall()
+            
+            print(f"📚 Encontrados {len(cursos_db)} cursos en la base de datos")
+            
+            # Crear diccionario de cursos con sus estudiantes
+            cursos_dict = {}
+            
+            for curso_row in cursos_db:
+                curso_id = curso_row[0]
+                curso_nombre = curso_row[1]
+                
+                # Obtener estudiantes de este curso
+                cursor.execute("""
+                    SELECT id_Est, Apellido, nombre, DNI, email_Est
+                    FROM estudiantes
+                    WHERE curso_id = %s
+                    ORDER BY Apellido, nombre
+                """, (curso_id,))
+                
+                estudiantes = cursor.fetchall()
+                
+                estudiantes_list = []
+                for est in estudiantes:
+                    estudiantes_list.append({
+                        "id": est[0],
+                        "apellido": est[1] or "",
+                        "nombre": est[2] or "Sin nombre",
+                        "dni": est[3] or "",
+                        "email": est[4] or "",
+                    })
+                
+                # Usar el id del curso como clave
+                cursos_dict[str(curso_id)] = {
+                    "id": curso_id,
+                    "nombre": curso_nombre,
+                    "estudiantes": estudiantes_list
+                }
+                
+                print(f"   Curso {curso_id} ({curso_nombre}): {len(estudiantes_list)} estudiantes")
+            
+            return cursos_dict
+                    
+    except Exception as e:
+        print(f"❌ Error obteniendo estudiantes por curso: {e}")
+        import traceback
+        traceback.print_exc()
+        return {}
+    finally:
+        conn.close()
 
 # ----- PERFIL ESTUDIANTE -----
 def obtener_estudiante_por_id(estudiante_id):
@@ -87,166 +138,6 @@ def obtener_asistencias_estudiante(estudiante_id):
     finally:
         conn.close()
     return []
-
-# ----- LISTADO POR CURSO -----
-def obtener_estudiantes_por_curso():
-    """Devuelve un diccionario { '1': [estudiantes], ..., '6': [...] }"""
-    conn = conectar_db(DB_NAME)
-    cursos = {str(i): [] for i in range(1, 7)}
-    
-    if not conn:
-        print("❌ No se pudo conectar a la base de datos para obtener estudiantes por curso")
-        return cursos
-    
-    try:
-        with conn.cursor() as cursor:
-            # Verificar si la tabla estudiantes existe
-            cursor.execute("SHOW TABLES LIKE 'estudiantes'")
-            if not cursor.fetchone():
-                print("⚠️ La tabla 'estudiantes' no existe")
-                return cursos
-            
-            # Obtener estudiantes por curso
-            cursor.execute("""
-                SELECT id, nombre, apellido, dni, curso
-                FROM estudiantes
-                WHERE curso IN ('1','2','3','4','5','6')
-                ORDER BY CAST(curso AS UNSIGNED), apellido IS NULL, apellido, nombre
-            """)
-            
-            estudiantes = cursor.fetchall()
-            print(f"📊 Encontrados {len(estudiantes)} estudiantes en la base de datos")
-            
-            for row in estudiantes:
-                est = {
-                    "id": row[0],
-                    "nombre": row[1] or "Sin nombre",
-                    "apellido": row[2] or "",
-                    "dni": row[3] or "",
-                    "curso": row[4] or "Sin curso",
-                }
-                key = str(est.get("curso") or "")
-                if key in cursos:
-                    cursos[key].append(est)
-                else:
-                    print(f"⚠️ Curso '{key}' no válido para estudiante {est['nombre']}")
-                    
-    except Exception as e:
-        print(f"❌ Error obteniendo estudiantes por curso: {e}")
-    finally:
-        conn.close()
-    
-    # Mostrar resumen
-    total_estudiantes = sum(len(estudiantes) for estudiantes in cursos.values())
-    print(f"📈 Total de estudiantes organizados: {total_estudiantes}")
-    for curso, estudiantes in cursos.items():
-        print(f"   Curso {curso}: {len(estudiantes)} estudiantes")
-    
-    return cursos
-
-# ----- FUNCIÓN PARA DATOS DE PRUEBA -----
-def crear_datos_prueba():
-    """Crea datos de prueba si no hay estudiantes en la base de datos"""
-    conn = conectar_db(DB_NAME)
-    if not conn:
-        return False
-    
-    try:
-        with conn.cursor() as cursor:
-            # Verificar si ya hay estudiantes
-            cursor.execute("SELECT COUNT(*) FROM estudiantes")
-            count = cursor.fetchone()[0]
-            
-            if count > 0:
-                print(f"✅ Ya hay {count} estudiantes en la base de datos")
-                return True
-            
-            print("📝 No hay estudiantes en la base de datos")
-            print("💡 Usa el botón 'Cargar 4° Año' para agregar estudiantes específicos")
-            return True
-            
-    except Exception as e:
-        print(f"❌ Error creando datos de prueba: {e}")
-        conn.rollback()
-        return False
-    finally:
-        conn.close()
-
-# ----- FUNCIÓN PARA CARGAR ESTUDIANTES ESPECÍFICOS DE 4° AÑO -----
-def cargar_estudiantes_4to_especificos():
-    """Carga los estudiantes específicos de 4° año proporcionados por el usuario"""
-    conn = conectar_db(DB_NAME)
-    if not conn:
-        return False
-    
-    try:
-        with conn.cursor() as cursor:
-            # Lista específica de estudiantes de 4° año
-            estudiantes_4to = [
-                "Barrionuevo Candela",
-                "Barrionuevo Martina", 
-                "Brizuela Sofia Mariel Luz",
-                "Castaño Giovana Alejo",
-                "Castillo Mia Brisa",
-                "Coolino Gomez Luisana",
-                "Gallay Yair Eliel",
-                "Gontero Kyara Alejandra",
-                "Grinovero Bautista",
-                "Guevara Kurozaki Alejandro Luis",
-                "Illarraga Gonzalez Luis Felipe",
-                "Leone Barrionuevo Franco",
-                "Lopez Joaquin",
-                "Lujan Della Vedova Pedro",
-                "Marratin Lola",
-                "Pino Malena Guillermina",
-                "Raffos Joaquin",
-                "Renoso Thiago Joel",
-                "Romero Marcos Valentin",
-                "Serminatti Alejo Andre",
-                "Torres Martias",
-                "Vergara Sofia Magdalena",
-                "Zalazar Lucila"
-            ]
-            
-            # Limpiar estudiantes existentes de 4° año
-            cursor.execute("DELETE FROM estudiantes WHERE curso = '4'")
-            print(f"🗑️ Eliminados estudiantes existentes de 4° año")
-            
-            # Insertar nuevos estudiantes
-            estudiantes_insertados = 0
-            for nombre_completo in estudiantes_4to:
-                # Separar nombre y apellido
-                partes = nombre_completo.strip().split()
-                if len(partes) >= 2:
-                    nombre = partes[0]
-                    apellido = " ".join(partes[1:])  # El resto es el apellido
-                    
-                    # Generar email basado en el nombre
-                    email = f"{nombre.lower()}.{apellido.lower().replace(' ', '.')}@proa.edu.ar"
-                    
-                    # Generar DNI ficticio (8 dígitos)
-                    dni = f"{20000000 + estudiantes_insertados + 1}"
-                    
-                    # Insertar estudiante
-                    cursor.execute("""
-                        INSERT INTO estudiantes (nombre, apellido, dni, email, curso)
-                        VALUES (%s, %s, %s, %s, %s)
-                    """, (nombre, apellido, dni, email, "4"))
-                    
-                    estudiantes_insertados += 1
-                    print(f"✅ Insertado: {apellido}, {nombre}")
-            
-            conn.commit()
-            print(f"\n🎉 ¡Cargados {estudiantes_insertados} estudiantes de 4° año!")
-            return True
-            
-    except Exception as e:
-        print(f"❌ Error cargando estudiantes de 4° año: {e}")
-        conn.rollback()
-        return False
-    finally:
-        conn.close()
-
 # ----- RUTAS -----
 
 # Ruta para mostrar el perfil del estudiante
@@ -258,16 +149,6 @@ def perfil_estudiante():
         flash('Debes iniciar sesión para ver tu perfil.')
         return redirect(url_for('login'))
     estudiante = obtener_estudiante_por_id(estudiante_id)
-    asistencias = obtener_asistencias_estudiante(estudiante_id)
-    return render_template('perfil_estudiante.html', estudiante=estudiante, asistencias=asistencias)
-
-# Perfil por ID directo (sin requerir sesión) para usar desde "Ver perfil"
-@app.route('/estudiante/<int:estudiante_id>')
-def perfil_estudiante_publico(estudiante_id: int):
-    estudiante = obtener_estudiante_por_id(estudiante_id)
-    if not estudiante:
-        flash('Estudiante no encontrado.')
-        return redirect(url_for('index'))
     asistencias = obtener_asistencias_estudiante(estudiante_id)
     return render_template('perfil_estudiante.html', estudiante=estudiante, asistencias=asistencias)
 
@@ -306,12 +187,36 @@ def logout():
     session.clear()
     flash('Sesión cerrada correctamente.')
     return redirect(url_for('login'))
+
+# Listado de alumnos por curso (desde la tabla cursos)
+@app.route('/cursos')
+def listar_cursos():
+    try:
+        print("🔍 Accediendo a la vista de cursos...")
+        
+        cursos_dict = obtener_estudiantes_por_curso()
+        
+        # Verificar si hay cursos
+        if not cursos_dict:
+            flash("ℹ️ No hay cursos registrados en la base de datos.")
+        
+        print(f"✅ Preparando vista con {len(cursos_dict)} cursos")
+        return render_template('listas_cursos.html', cursos=cursos_dict)
+        
+    except Exception as e:
+        print(f"❌ Error en la vista de cursos: {e}")
+        import traceback
+        traceback.print_exc()
+        flash(f"❌ Error al cargar la lista de cursos: {e}")
+        return render_template('listas_cursos.html', cursos={})
+
 @app.route('/')
 def index():
     return render_template('login.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    return render_template('index.html')
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -350,48 +255,7 @@ def login():
     # Si es GET, muestra el formulario de login
     return render_template('login.html')
 
-# Listado de alumnos por curso (1° a 6°)
-@app.route('/cursos')
-def listar_cursos():
-    try:
-        print("🔍 Accediendo a la vista de cursos...")
-        
-        # Intentar crear datos de prueba si no hay estudiantes
-        crear_datos_prueba()
-        
-        cursos_dict = obtener_estudiantes_por_curso()
-        
-        # Verificar si hay estudiantes
-        total_estudiantes = sum(len(estudiantes) for estudiantes in cursos_dict.values())
-        if total_estudiantes == 0:
-            flash("ℹ️ No hay estudiantes registrados en ningún curso. Puedes agregar estudiantes desde 'Registrar Asistencia'.")
-        
-        print(f"✅ Preparando vista con {total_estudiantes} estudiantes")
-        return render_template('listas_cursos.html', cursos=cursos_dict)
-        
-    except Exception as e:
-        print(f"❌ Error en la vista de cursos: {e}")
-        flash(f"❌ Error al cargar la lista de cursos: {e}")
-        # Devolver diccionario vacío en caso de error
-        cursos_vacios = {str(i): [] for i in range(1, 7)}
-        return render_template('listas_cursos.html', cursos=cursos_vacios)
-
-# Ruta para cargar estudiantes específicos de 4° año
-@app.route('/cargar_4to')
-def cargar_estudiantes_4to():
-    try:
-        print("🚀 Cargando estudiantes específicos de 4° año...")
-        if cargar_estudiantes_4to_especificos():
-            flash("✅ Estudiantes de 4° año cargados exitosamente!")
-        else:
-            flash("❌ Error al cargar estudiantes de 4° año")
-        return redirect(url_for('listar_cursos'))
-    except Exception as e:
-        print(f"❌ Error en la ruta de carga: {e}")
-        flash(f"❌ Error: {e}")
-        return redirect(url_for('listar_cursos'))
-
-@app.route('/registro', methods=['GET', 'POST'])
+|1@app.route('/registro', methods=['GET', 'POST'])
 def registrar_asistencia():
     if request.method == 'POST':
         # Datos del formulario
@@ -453,11 +317,8 @@ def registrar_asistencia():
     return render_template('index.html')
 
 
-@app.route('/registro_usuario', methods=['GET', 'POST'])
-def registro_usuario():
-    if request.method == 'GET':
-        return render_template('registro_usuario.html')
-    
+@app.route('/registrar_usuario', methods=['POST'])
+def registrar_usuario():
     nombre = request.form.get('nombre')
     email = request.form.get('email')
     password = request.form.get('password')
@@ -465,16 +326,16 @@ def registro_usuario():
 
     if not nombre or not email or not password or not confirm_password:
         flash("⚠️ Todos los campos son obligatorios.")
-        return redirect('/registro_usuario')
+        return redirect('/registro')
 
     if password != confirm_password:
         flash("⚠️ Las contraseñas no coinciden.")
-        return redirect('/registro_usuario')
+        return redirect('/registro')
 
     conn = conectar_db(DB_NAME)
     if not conn:
         flash("❌ Error de conexión a la base de datos.")
-        return redirect('/registro_usuario')
+        return redirect('/registro')
 
     try:
         hashed_password = generate_password_hash(password)
@@ -494,7 +355,6 @@ def registro_usuario():
         conn.close()
 
     return redirect('/login')
-
 
 # ----- EJECUCIÓN -----
 if __name__ == '__main__':

@@ -107,3 +107,5 @@ SHOW TABLES;
 DESCRIBE estudiantes;
 DESCRIBE usuarios;
 DESCRIBE asistencias;
+
+
