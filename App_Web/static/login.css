@@ -71,8 +71,8 @@ body {
   margin-bottom: 25px;
   font-weight: 700;
   font-size: 1.8em;
-  color: #00f0ff;
-  text-shadow: 0 0 8px rgba(0, 200, 255, 0.9);
+  color: #4DB8D5;
+  text-shadow: 0 2px 8px rgba(77, 184, 213, 0.5);
 }
 
 /* Inputs */
@@ -85,7 +85,7 @@ body {
 .input-group label {
   font-size: 0.95em;
   font-weight: 500;
-  color: #cdefff;
+  color: #E0F0FF;
 }
 
 .input-group input {
@@ -102,8 +102,8 @@ body {
 }
 
 .input-group input:focus {
-  border-color: #00f0ff;
-  box-shadow: 0 0 8px rgba(0, 200, 255, 0.6);
+  border-color: #4DB8D5;
+  box-shadow: 0 0 8px rgba(77, 184, 213, 0.5);
   background: rgba(0, 50, 80, 0.65);
 }
 
@@ -114,7 +114,7 @@ body {
   margin-top: 15px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #00d4ff, #007bff);
+  background: linear-gradient(135deg, #2B7FD9, #4DB8D5);
   color: #fff;
   font-weight: 600;
   cursor: pointer;
@@ -124,7 +124,7 @@ body {
 
 .btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 200, 255, 0.6);
+  box-shadow: 0 8px 20px rgba(77, 184, 213, 0.5);
 }
 
 /* Links */
@@ -135,7 +135,7 @@ body {
 }
 
 .registro a {
-  color: #00f0ff;
+  color: #5ABFD9;
   text-decoration: none;
   font-weight: 500;
 }

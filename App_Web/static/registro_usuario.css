@@ -96,9 +96,9 @@ body {
   margin-bottom: 30px;
   font-weight: 700;
   font-size: 2em;
-  color: #00eaff;
-  text-shadow: 0 0 15px rgba(0, 234, 255, 0.8);
-  background: linear-gradient(45deg, #00eaff, #0099ff);
+  color: #4DB8D5;
+  text-shadow: 0 2px 12px rgba(77, 184, 213, 0.5);
+  background: linear-gradient(45deg, #4DB8D5, #2B7FD9);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -115,10 +115,10 @@ body {
 .input-group label {
   font-size: 1em;
   font-weight: 600;
-  color: #00eaff;
+  color: #5ABFD9;
   margin-bottom: 8px;
   display: block;
-  text-shadow: 0 0 5px rgba(0, 234, 255, 0.3);
+  text-shadow: 0 1px 4px rgba(77, 184, 213, 0.2);
 }
 
 .input-group input {
@@ -126,24 +126,24 @@ body {
   padding: 14px 16px;
   margin-top: 6px;
   border-radius: 12px;
-  border: 2px solid rgba(0, 234, 255, 0.3);
+  border: 2px solid rgba(77, 184, 213, 0.3);
   outline: none;
   background: rgba(20, 20, 20, 0.8);
-  color: #e9f6ff;
+  color: #F0F9FF;
   font-size: 1em;
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 .input-group input:focus {
-  border-color: #00eaff;
-  box-shadow: 0 0 15px rgba(0, 234, 255, 0.4);
+  border-color: #4DB8D5;
+  box-shadow: 0 0 15px rgba(77, 184, 213, 0.4);
   background: rgba(30, 30, 30, 0.9);
   transform: translateY(-2px);
 }
 
 .input-group input::placeholder {
-  color: rgba(233, 246, 255, 0.6);
+  color: rgba(240, 249, 255, 0.5);
   font-style: italic;
 }
 
@@ -163,7 +163,7 @@ body {
   margin-top: 20px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #00eaff 0%, #0099ff 50%, #00eaff 100%);
+  background: linear-gradient(135deg, #4DB8D5 0%, #2B7FD9 50%, #4DB8D5 100%);
   background-size: 200% 200%;
   color: #fff;
   font-weight: 700;
@@ -189,7 +189,7 @@ body {
 
 .btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(0, 234, 255, 0.5);
+  box-shadow: 0 10px 25px rgba(77, 184, 213, 0.5);
   background-position: 100% 0;
 }
 
