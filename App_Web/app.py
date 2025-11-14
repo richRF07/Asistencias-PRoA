@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, session, url_for
+from flask import Flask, render_template, request, redirect, flash, session, url_for, jsonify
 from datetime import date
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -188,7 +188,7 @@ def actualizar_perfil():
     except Exception as e:
         conn.rollback()
         print(f"ERROR al actualizar perfil: {e}")
-        flash(f"❌ Error al actualizar perfil: {e}")
+        flash(f"❌ Error al actualizar perfil: {e}")    
     finally:
         conn.close()
     return redirect(url_for('perfil_estudiante'))
@@ -267,6 +267,13 @@ def login():
             conn.close()
     # Si es GET, muestra el formulario de login
     return render_template('login.html')
+
+
+# Página de registro de usuario (formulario GET)
+@app.route('/registro_usuario', methods=['GET'])
+def registro_usuario_page():
+    """Muestra la página de registro de usuario con el mismo estilo profesional."""
+    return render_template('registro_usuario.html')
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registrar_asistencia():
@@ -383,7 +390,87 @@ def registrar_usuario():
 
     return redirect('/login')
 
+# Ruta para buscar estudiantes
+@app.route('/buscar_estudiante', methods=['POST'])
+def buscar_estudiante():
+    try:
+        # request.get_json puede devolver None si no viene JSON válido; usar silent=True
+        # y caer a diccionario vacío para evitar AttributeError al hacer datos.get(...)
+        datos = request.get_json(silent=True) or {}
+        print(f"DEBUG /buscar_estudiante payload: {datos}")
+        nombre = (datos.get('nombre') or '').strip()
+        curso = (datos.get('curso') or '').strip()
+        ordenar = datos.get('ordenar', 'apellido')
+
+        conn = conectar_db(DB_NAME)
+        if not conn:
+            return jsonify({"error": "Error de conexión a la base de datos"}), 500
+
+        try:
+            with conn.cursor() as cursor:
+                # Construir la consulta base
+                query = """
+                    SELECT e.id_Est, e.Apellido, e.nombre, e.DNI, e.email_Est, e.curso_id
+                    FROM estudiantes e
+                    WHERE 1=1
+                """
+                params = []
+
+                # Agregar filtros si se proporcionaron
+                if nombre:
+                    query += " AND (LOWER(e.nombre) LIKE %s OR LOWER(e.Apellido) LIKE %s)"
+                    nombre_buscar = f"%{nombre.lower()}%"
+                    params.extend([nombre_buscar, nombre_buscar])
+
+                if curso:
+                    query += " AND e.curso_id = %s"
+                    params.append(curso)
+
+                # Agregar ordenamiento
+                if ordenar == 'apellido':
+                    query += " ORDER BY e.Apellido, e.nombre"
+                elif ordenar == 'nombre':
+                    query += " ORDER BY e.nombre, e.Apellido"
+                elif ordenar == 'curso':
+                    query += " ORDER BY e.curso_id, e.Apellido, e.nombre"
+
+                cursor.execute(query, params)
+                estudiantes = cursor.fetchall()
+
+                # Organizar resultados por curso
+                resultados = {}
+                for estudiante in estudiantes:
+                    curso_id = str(estudiante[5])  # curso_id
+                    if curso_id not in resultados:
+                        resultados[curso_id] = []
+                    
+                    resultados[curso_id].append({
+                        "id": estudiante[0],
+                        "apellido": estudiante[1] or "",
+                        "nombre": estudiante[2] or "Sin nombre",
+                        "dni": estudiante[3] or "",
+                        "email": estudiante[4] or ""
+                    })
+
+                # Loguear resumen de resultados para debugging
+                try:
+                    resumen = {k: len(v) for k, v in resultados.items()}
+                except Exception:
+                    resumen = {}
+                print(f"RESULTADOS /buscar_estudiante: cursos={list(resultados.keys())} resumen={resumen}")
+
+                return jsonify(resultados)
+
+        except Exception as e:
+            print(f"Error en la búsqueda: {e}")
+            return jsonify({"error": str(e)}), 500
+        finally:
+            conn.close()
+
+    except Exception as e:
+        print(f"Error en la solicitud: {e}")
+        return jsonify({"error": str(e)}), 400
+
 # ----- EJECUCIÓN -----
 if __name__ == '__main__':
-
     app.run(debug=True)

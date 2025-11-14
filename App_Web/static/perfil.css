@@ -162,12 +162,13 @@ form input:focus {
 
 .nav-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  position: relative;
 }
 
 .nav-link {
@@ -206,6 +207,138 @@ form input:focus {
   background: rgba(220, 50, 50, 0.5);
   border-color: rgba(255, 100, 100, 0.8);
   color: #FFFFFF;
+}
+
+/* Botón toggle del menú */
+.menu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: rgba(77, 184, 213, 0.25);
+  border: 2px solid rgba(77, 184, 213, 0.4);
+  color: #FFFFFF !important;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.menu-toggle:hover {
+  background: rgba(77, 184, 213, 0.45);
+  border-color: rgba(77, 184, 213, 0.7);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(77, 184, 213, 0.4);
+}
+
+.menu-toggle.active {
+  background: rgba(77, 184, 213, 0.6);
+  border-color: #FFFFFF;
+}
+
+.menu-icon {
+  font-size: 1.2em;
+}
+
+.menu-text {
+  font-size: 1em;
+}
+
+/* Menú desplegable */
+.nav-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 20px;
+  background: rgba(20, 30, 50, 0.98);
+  backdrop-filter: blur(15px);
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+  padding: 15px 0;
+  min-width: 250px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1001;
+  border: 1px solid rgba(77, 184, 213, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contenedor de los items del menú principal */
+.nav-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Separador visual */
+.nav-separator {
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(77, 184, 213, 0.3), 
+    transparent
+  );
+  margin: 10px 15px;
+}
+
+/* Contenedor para el botón de cerrar sesión */
+.nav-logout-container {
+  padding: 5px 0 0 0;
+  margin-top: auto;
+}
+
+.nav-dropdown.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-dropdown .nav-link {
+  display: block;
+  padding: 12px 25px;
+  margin: 0;
+  border-radius: 0;
+  border: none;
+  border-left: 3px solid transparent;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.nav-dropdown .nav-link:hover {
+  background: rgba(77, 184, 213, 0.25);
+  border-left-color: rgba(77, 184, 213, 0.8);
+  transform: translateX(5px);
+  box-shadow: none;
+}
+
+.nav-dropdown .nav-link.active {
+  background: rgba(77, 184, 213, 0.3);
+  border-left-color: #FFFFFF;
+  transform: translateX(0);
+}
+
+.nav-dropdown .nav-link.logout {
+  border-left-color: rgba(255, 100, 100, 0.6);
+  margin: 0 15px;
+  border-radius: 8px;
+}
+
+.nav-dropdown .nav-logout-container .nav-link.logout {
+  background: rgba(220, 50, 50, 0.35);
+  border: 2px solid rgba(255, 100, 100, 0.6);
+  border-left-width: 3px;
+}
+
+.nav-dropdown .nav-link.logout:hover {
+  background: rgba(220, 50, 50, 0.5);
+  border-color: rgba(255, 100, 100, 0.8);
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(220, 50, 50, 0.4);
 }
 
 /* Botonera del perfil */
@@ -250,11 +383,18 @@ form input:focus {
   }
   
   .nav-container {
-    flex-wrap: wrap;
-    gap: 10px;
+    padding: 0 15px;
   }
   
-  .nav-link {
+  .nav-dropdown {
+    left: 15px;
+    right: 15px;
+    min-width: auto;
+    width: calc(100% - 30px);
+    max-width: 350px;
+  }
+  
+  .menu-toggle {
     padding: 8px 15px;
     font-size: 0.9rem;
   }

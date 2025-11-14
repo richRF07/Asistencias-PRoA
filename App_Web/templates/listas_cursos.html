@@ -14,17 +14,26 @@
   <!-- Navegación Principal -->
   <nav class="nav-principal">
     <div class="nav-container">
-      <a href="{{ url_for('perfil_estudiante') }}" class="nav-link">Mi Perfil</a>
-      <a href="{{ url_for('listar_cursos') }}" class="nav-link active">Ver Cursos</a>
-      <a href="{{ url_for('registrar_asistencia') }}" class="nav-link">Registrar Asistencia</a>
-      <a href="{{ url_for('logout') }}" class="nav-link logout">Cerrar Sesión</a>
+      <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">
+        <span class="menu-icon">☰</span>
+        <span class="menu-text">Menú</span>
+      </button>
+      <div class="nav-dropdown" id="navDropdown">
+        <div class="nav-menu-items">
+          <a href="{{ url_for('perfil_estudiante') }}" class="nav-link">Mi Perfil</a>
+          <a href="{{ url_for('listar_cursos') }}" class="nav-link active">Ver Cursos</a>
+          <a href="{{ url_for('registrar_asistencia') }}" class="nav-link">Registrar Asistencia</a>
+        </div>
+        <div class="nav-separator"></div>
+        <div class="nav-logout-container">
+          <a href="{{ url_for('logout') }}" class="nav-link logout">Cerrar Sesión</a>
+        </div>
+      </div>
     </div>
   </nav>
 
   <header>
-    <h1>📚 Listado de Alumnos por Curso</h1>
-    
-    <!-- Mensajes flash -->
+    <h1> Listado de Alumnos por Curso</h1>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash-messages">
@@ -40,8 +49,7 @@
         </div>
       {% endif %}
     {% endwith %}
-    
-    <!-- Botonera de acciones rápidas -->
+
     <div class="botonera-acciones">
       <a href="{{ url_for('registrar_asistencia') }}" class="btn-accion-principal">
         <span class="icono">📝</span>
@@ -49,13 +57,9 @@
       </a>
       <button onclick="mostrarFiltros()" class="btn-accion-principal">
         <span class="icono">🔍</span>
-        Filtrar Cursos
+        Filtrar Estudiante
       </button>
-      <a href="{{ url_for('cargar_estudiantes_4to') }}" class="btn-accion-principal">
-        <span class="icono">📚</span>
-        Cargar 4° Año
-      </a>
-    </div>
+      </div>
   </header>
 
   <!-- Panel de filtros -->
@@ -109,11 +113,15 @@
     </div>
   </div>
 
-  <main class="cursos-container">
-    <div class="grid-cursos">
-      {% for numero in ['1','2','3','4','5','6'] %}
-      <section class="card-curso">
-        <h2>{{ numero }}° Año</h2>
+  <!-- LISTADO DE CURSOS CON ACORDEÓN -->
+<main class="cursos-container">
+  <div class="grid-cursos">
+    {% for numero in ['1','2','3','4','5','6'] %}
+    <section class="card-curso" data-curso="{{ numero }}">
+      <button class="accordion" onclick="toggleAccordion(this)">
+        {{ numero }}° Año
+      </button>
+      <div class="panel">
         <ul class="lista-alumnos">
           {% for alumno in cursos.get(numero, []) %}
           <li class="alumno-item">
@@ -128,246 +136,143 @@
                 <span class="icono-btn">👁️</span>
                 Ver Perfil
               </a>
-              <button class="btn-info" data-estudiante-id="{{ alumno.id }}">
-                <span class="icono-btn">ℹ️</span>
-                Info
-              </button>
             </div>
           </li>
           {% else %}
           <li class="alumno-item"><span class="alumno-nombre">Sin alumnos cargados</span></li>
           {% endfor %}
         </ul>
-      </section>
-      {% endfor %}
-    </div>
-  </main>
-
-  <!-- Modal para información del alumno -->
-  <div id="modal-info" class="modal" style="display: none;">
-    <div class="modal-content">
-      <span class="close" onclick="cerrarModal()">&times;</span>
-      <h3>Información del Estudiante</h3>
-      <div id="info-contenido"></div>
-    </div>
+      </div>
+    </section>
+    {% endfor %}
   </div>
+</main>
+
+  <!-- Modal eliminado (botón Info removido) -->
 
   <script>
-    // Función para mostrar información del alumno
-    function mostrarInfoAlumno(estudianteId) {
-      // Aquí podrías hacer una petición AJAX para obtener más información
-      // Por ahora mostraremos información básica
-      const modal = document.getElementById('modal-info');
-      const contenido = document.getElementById('info-contenido');
-      
-      if (!modal || !contenido) {
-        console.error('Modal o contenido no encontrado');
-        return;
-      }
-      
-      contenido.innerHTML = `
-        <p><strong>ID:</strong> ${estudianteId}</p>
-        <p><strong>Estado:</strong> Activo</p>
-        <p><strong>Última asistencia:</strong> Reciente</p>
-        <p><strong>Acciones disponibles:</strong></p>
-        <ul>
-          <li>Ver perfil completo</li>
-          <li>Ver historial de asistencias</li>
-          <li>Registrar nueva asistencia</li>
-        </ul>
-      `;
-      
-      modal.style.display = 'block';
-    }
-    
-    // Función para cerrar el modal
-    function cerrarModal() {
-      const modal = document.getElementById('modal-info');
-      if (modal) {
-        modal.style.display = 'none';
-      }
-    }
-    
-    // Función para mostrar/ocultar filtros
+    // Evitar múltiples peticiones simultáneas
+    let isFetching = false;
+    // ===============================
+    // FUNCIONES DE FILTROS
+    // ===============================
     function mostrarFiltros() {
-      const panel = document.getElementById('panel-filtros');
-      if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-        panel.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        panel.style.display = 'none';
-      }
+      const panelFiltros = document.getElementById('panel-filtros');
+      panelFiltros.style.display = 'block';
     }
-    
+
     function cerrarFiltros() {
-      document.getElementById('panel-filtros').style.display = 'none';
+      const panelFiltros = document.getElementById('panel-filtros');
+      panelFiltros.style.display = 'none';
     }
-    
-    // Función para aplicar filtros
-    function aplicarFiltros() {
-      const buscarNombre = document.getElementById('buscar-nombre').value.toLowerCase();
-      const filtroCurso = document.getElementById('filtro-curso').value;
-      const ordenarPor = document.getElementById('ordenar-por').value;
-      
-      // Obtener todas las tarjetas de curso
-      const cardsCursos = document.querySelectorAll('.card-curso');
-      let totalMostrados = 0;
-      
-      cardsCursos.forEach(card => {
-        const cursoNumero = card.querySelector('h2').textContent.replace('° Año', '');
-        const listaAlumnos = card.querySelector('.lista-alumnos');
-        const alumnos = listaAlumnos.querySelectorAll('.alumno-item');
-        let alumnosVisibles = 0;
-        
-        // Filtrar por curso
-        if (filtroCurso && cursoNumero !== filtroCurso) {
-          card.style.display = 'none';
-          return;
-        } else {
-          card.style.display = 'block';
-        }
-        
-        // Filtrar y ordenar alumnos
-        const alumnosArray = Array.from(alumnos);
-        
-        // Filtrar por nombre/apellido
-        const alumnosFiltrados = alumnosArray.filter(alumno => {
-          const nombreCompleto = alumno.querySelector('.alumno-nombre').textContent.toLowerCase();
-          const dni = alumno.querySelector('.alumno-dni') ? alumno.querySelector('.alumno-dni').textContent.toLowerCase() : '';
-          
-          if (!buscarNombre) return true;
-          return nombreCompleto.includes(buscarNombre) || dni.includes(buscarNombre);
-        });
-        
-        // Ordenar alumnos
-        alumnosFiltrados.sort((a, b) => {
-          const nombreA = a.querySelector('.alumno-nombre').textContent.toLowerCase();
-          const nombreB = b.querySelector('.alumno-nombre').textContent.toLowerCase();
-          
-          switch(ordenarPor) {
-            case 'nombre':
-              return nombreA.localeCompare(nombreB);
-            case 'curso':
-              return cursoNumero.localeCompare(cursoNumero);
-            default: // apellido
-              return nombreA.localeCompare(nombreB);
-          }
-        });
-        
-        // Mostrar/ocultar alumnos
-        alumnosArray.forEach(alumno => {
-          if (alumnosFiltrados.includes(alumno)) {
-            alumno.style.display = 'flex';
-            alumnosVisibles++;
-          } else {
-            alumno.style.display = 'none';
-          }
-        });
-        
-        // Mostrar mensaje si no hay alumnos visibles
-        const mensajeSinAlumnos = card.querySelector('.sin-alumnos');
-        if (mensajeSinAlumnos) {
-          mensajeSinAlumnos.remove();
-        }
-        
-        if (alumnosVisibles === 0) {
-          const mensaje = document.createElement('li');
-          mensaje.className = 'sin-alumnos';
-          mensaje.innerHTML = '<span class="alumno-nombre">No se encontraron estudiantes</span>';
-          listaAlumnos.appendChild(mensaje);
-        }
-        
-        totalMostrados += alumnosVisibles;
-      });
-      
-      // Mostrar resumen de resultados
-      mostrarResumenFiltros(totalMostrados, buscarNombre, filtroCurso);
-    }
-    
-    // Función para limpiar filtros
+
     function limpiarFiltros() {
       document.getElementById('buscar-nombre').value = '';
       document.getElementById('filtro-curso').value = '';
       document.getElementById('ordenar-por').value = 'apellido';
+      aplicarFiltros();
+    }
+
+    function aplicarFiltros() {
+      if (isFetching) return; // ya hay una petición en curso
+      const nombre = document.getElementById('buscar-nombre').value;
+      const curso = document.getElementById('filtro-curso').value;
+      const ordenar = document.getElementById('ordenar-por').value;
       
-      // Mostrar todos los alumnos y cursos
-      const cardsCursos = document.querySelectorAll('.card-curso');
-      cardsCursos.forEach(card => {
-        card.style.display = 'block';
-        const alumnos = card.querySelectorAll('.alumno-item');
-        alumnos.forEach(alumno => {
-          alumno.style.display = 'flex';
-        });
-        
-        // Remover mensaje de sin alumnos
-        const mensajeSinAlumnos = card.querySelector('.sin-alumnos');
-        if (mensajeSinAlumnos) {
-          mensajeSinAlumnos.remove();
-        }
+      isFetching = true;
+      // Realizar la búsqueda mediante AJAX
+      fetch('/buscar_estudiante', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: nombre,
+          curso: curso,
+          ordenar: ordenar
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Actualizar la vista con los resultados
+        console.log('Respuesta /buscar_estudiante', data);
+        actualizarListaEstudiantes(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al buscar estudiantes');
+      })
+      .finally(() => {
+        isFetching = false;
       });
-      
-      // Limpiar resumen
-      const resumen = document.getElementById('resumen-filtros');
-      if (resumen) {
-        resumen.remove();
-      }
     }
-    
-    // Función para mostrar resumen de filtros
-    function mostrarResumenFiltros(total, busqueda, curso) {
-      // Remover resumen anterior
-      const resumenAnterior = document.getElementById('resumen-filtros');
-      if (resumenAnterior) {
-        resumenAnterior.remove();
-      }
-      
-      // Crear nuevo resumen
-      const resumen = document.createElement('div');
-      resumen.id = 'resumen-filtros';
-      resumen.className = 'resumen-filtros';
-      
-      let textoResumen = `🔍 Mostrando ${total} estudiante${total !== 1 ? 's' : ''}`;
-      if (busqueda) textoResumen += ` que contienen "${busqueda}"`;
-      if (curso) textoResumen += ` del curso ${curso}°`;
-      
-      resumen.innerHTML = `
-        <div class="resumen-content">
-          <span class="resumen-texto">${textoResumen}</span>
-          <button onclick="limpiarFiltros()" class="btn-limpiar-resumen">Limpiar filtros</button>
-        </div>
-      `;
-      
-      // Insertar después del header
-      const header = document.querySelector('header');
-      header.insertAdjacentElement('afterend', resumen);
-    }
-    
-    // Función para filtrar cursos (placeholder)
-    function filtrarCursos() {
-      alert('Función de filtrado próximamente disponible');
-    }
-    
-    // Cerrar modal al hacer clic fuera de él
-    window.onclick = function(event) {
-      const modal = document.getElementById('modal-info');
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    }
-    
-    // Mejorar la función onclick para usar data attributes
-    document.addEventListener('DOMContentLoaded', function() {
-      const infoButtons = document.querySelectorAll('.btn-info');
-      infoButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          const estudianteId = this.getAttribute('data-estudiante-id');
-          if (estudianteId) {
-            mostrarInfoAlumno(estudianteId);
+
+    function actualizarListaEstudiantes(data) {
+      // Recorrer cada curso y actualizar su contenido
+      for (const curso in data) {
+        const panel = document.querySelector(`[data-curso="${curso}"] .lista-alumnos`);
+        if (panel) {
+          if (data[curso].length > 0) {
+            panel.innerHTML = data[curso].map(alumno => `
+              <li class="alumno-item">
+                <div class="alumno-info">
+                  <span class="alumno-nombre">${alumno.apellido || ''} ${alumno.nombre}</span>
+                  ${alumno.dni ? `<span class="alumno-dni">DNI: ${alumno.dni}</span>` : ''}
+                </div>
+                <div class="botones-alumno">
+                  <a class="btn-ver" href="/estudiante/${alumno.id}">
+                    <span class="icono-btn">👁️</span>
+                    Ver Perfil
+                  </a>
+                </div>
+              </li>
+            `).join('');
+          } else {
+            panel.innerHTML = '<li class="alumno-item"><span class="alumno-nombre">Sin alumnos cargados</span></li>';
           }
-        });
-      });
+        }
+      }
+    }
+
+    // ===============================
+    // FUNCIONES DE ACORDEÓN
+    // ===============================
+    function toggleAccordion(button) {
+      button.classList.toggle("active");
+      const panel = button.nextElementSibling;
+      const arrow = button.querySelector(".flecha");
+
+      if (panel.classList.contains("show")) {
+        panel.classList.remove("show");
+        arrow.textContent = "▼";
+      } else {
+        panel.classList.add("show");
+        arrow.textContent = "▲";
+      }
+    }
+
+    // Modal y funciones de info eliminadas (no usadas en el proyecto)
+
+    // ===============================
+    // MENÚ DESPLEGABLE
+    // ===============================
+    function toggleMenu() {
+      const dropdown = document.getElementById('navDropdown');
+      const toggle = document.getElementById('menuToggle');
+      dropdown.classList.toggle('active');
+      toggle.classList.toggle('active');
+    }
+
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('navDropdown');
+      const toggle = document.getElementById('menuToggle');
+      if (!toggle.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.remove('active');
+        toggle.classList.remove('active');
+      }
     });
+
+    // Evento de botones Info eliminado (botón removido)
   </script>
 </body>
 </html>
-

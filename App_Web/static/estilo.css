@@ -85,6 +85,19 @@ header nav a:hover {
   text-align: center;
 }
 
+/* Título dentro del contenedor del formulario - más visible manteniendo el estilo */
+.contenedor-formulario h2 {
+  font-size: 1.4rem;
+  color: #FFFFFF;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+  text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(90deg, rgba(77,184,213,0.08), rgba(45,117,204,0.06));
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(77,184,213,0.12);
+}
+
 /* Inputs y labels */
 .formulario label {
   display: block;
